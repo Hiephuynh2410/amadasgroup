@@ -59,7 +59,7 @@ html, body {
 }
 
 a{ color: inherit; text-decoration: none; }
-.container{ width: min(1100px, 92%); margin: 1rem auto; }
+.container{ width: min(1100px, 92%); margin: 0 auto; }
 
 body{
   padding-top: 64px;
