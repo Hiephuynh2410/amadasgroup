@@ -3,6 +3,7 @@
   const TOTAL_ID = "total-visits";
   const ONLINE_ID = "online-now";
 
+  
   const KEY = "amadas_sid";
   let sid = localStorage.getItem(KEY);
   if (!sid) {
