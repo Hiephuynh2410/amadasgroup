@@ -1,0 +1,212 @@
+
+.people-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch; 
+}
+
+@media (max-width: 980px){
+  .people-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px){
+  .people-grid{ grid-template-columns: 1fr; }
+}
+
+.person-card{
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 14px;
+
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.28);
+  transition: transform .15s ease, border-color .15s ease;
+
+  height: 100%; 
+}
+
+.person-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.18);
+}
+
+/* Avatar */
+.person-avatar{
+  width: 78px;
+  height: 78px;
+  object-fit: cover;
+}
+
+.person-body{
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%; 
+}
+
+/* Header */
+.person-top{
+  display: grid;
+  gap: 6px;
+}
+
+.person-name{
+  font-weight: 800;
+  letter-spacing: .2px;
+  line-height: 1.15;
+  font-size: 18px;
+  color: rgba(255,255,255,.95);
+}
+
+.person-degree{
+  font-weight: 800;
+  line-height: 1.15;
+  font-size: 17px;
+  color: rgba(255,255,255,.95);
+}
+
+.person-role-short{
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(255,255,255,.78);
+  max-width: 42ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Details */
+.person-details{
+  margin-top: 10px;
+  padding: 12px;
+}
+
+/* List */
+.person-list{
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.person-list li{
+  line-height: 1.5;
+  color: rgba(255,255,255,.88);
+}
+
+.person-list li::marker{
+  color: rgba(255,255,255,.55);
+}
+
+.label{
+  font-weight: 700;
+  margin-right: 6px;
+  color: rgba(255,255,255,.92);
+}
+/* 
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin-top: 12px;
+    margin-bottom: 1px;
+    align-self: flex-end;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .04);
+    color: rgba(255, 255, 255, .90);
+    text-decoration: none;
+    font-size: 13px;
+} */
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin-top: 12px;
+    margin-bottom: 1px;
+    align-self: flex-end;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid #e4e4e4;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.pill:hover{
+  background: rgba(255,255,255,.06);
+}
+
+/* Mobile */
+@media (max-width: 620px){
+  .person-card{
+    grid-template-columns: 68px 1fr;
+    padding: 14px;
+  }
+  .person-avatar{
+    width: 68px;
+    height: 68px;
+    border-radius: 16px;
+  }
+  .person-degree{ font-size: 15px; }
+}
+
+/* ===== Compact person card ===== */
+.person-card--compact .person-mini{
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.person-card--compact .person-mini-line{
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--muted, #6b7280);
+}
+
+/* Tên nổi hơn một chút */
+.person-card--compact .person-name{
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  color: var(--text, #111827);
+}
+
+/* Bỏ phần list cũ nếu còn tồn tại trong layout */
+.person-card--compact .person-details{
+  display: none;
+}
+
+
+/* ===== Advisors grid: giãn đều ra full width ===== */
+.people-grid{
+  width: 100%;
+  max-width: none !important;          /* bỏ giới hạn nếu có */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+
+  display: grid;
+  gap: 22px;                           /* khoảng cách đều giữa các card */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: stretch;
+  align-items: stretch;
+}
+
+/* Card chiếm hết ô */
+.people-grid .person-card{
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 1024px){
+  .people-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px){
+  .people-grid{ grid-template-columns: 1fr; }
+}

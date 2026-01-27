@@ -1,0 +1,514 @@
+/* =========================
+   THEME TOKENS
+   ========================= */
+:root{
+  /* Dark (default) */
+  --bg: #0f0f10;
+  --panel: #141416;
+  --text: #f2f2f2;
+  --muted: #c9c9c9;
+  --line: rgba(255,255,255,.08);
+
+  --header-bg: rgba(15,15,16,.80);
+  --menu-bg: rgba(18,18,20,.92);
+  --submenu-bg: rgba(20,20,22,.98);
+
+  --shadow: rgba(0,0,0,.25);
+
+  --btn-bg: rgba(255,255,255,.06);
+  --btn-bg-hover: rgba(255,255,255,.09);
+  --btn-border: rgba(255,255,255,.16);
+  --btn-border-hover: rgba(255,255,255,.24);
+
+  --cursor: #ffffff;
+}
+
+:root[data-theme="light"]{
+  --bg: #f7f7f8;
+  --panel: #ffffff;
+  --text: #111114;
+  --muted: #3c3c40;
+  --line: rgba(0,0,0,.10);
+
+  --header-bg: rgba(255,255,255,.78);
+  --menu-bg: rgba(255,255,255,.92);
+  --submenu-bg: rgba(255,255,255,.98);
+
+  --shadow: rgba(0,0,0,.10);
+
+  --btn-bg: rgba(0,0,0,.04);
+  --btn-bg-hover: rgba(0,0,0,.07);
+  --btn-border: rgba(0,0,0,.10);
+  --btn-border-hover: rgba(0,0,0,.18);
+
+  --cursor: #111114;
+}
+
+/* =========================
+   BASE
+   ========================= */
+*{ box-sizing: border-box; }
+
+html, body {
+  margin:0;
+  padding:0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+a{ color: inherit; text-decoration: none; }
+.container{ width: min(1100px, 92%); margin: 1rem auto; }
+
+body{
+  padding-top: 64px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main.page{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+.site-header{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+
+  transform: translateY(-12px);
+  opacity: 0;
+  animation: navEnter .45s ease forwards;
+
+  box-shadow: 0 10px 30px var(--shadow);
+}
+
+@keyframes navEnter{
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Căn hàng trong header (1 lần thôi, không lặp nữa) */
+.nav-wrap{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  padding: 12px 0;
+  gap: 16px;
+  position: relative; /* để dropdown mobile bám đúng */
+}
+
+/* Brand */
+.brand{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.logo-amadas{
+  width: 21vh;
+  height: 50px;
+}
+
+/* Actions (theme + burger) */
+.nav-actions{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Theme button */
+.theme-toggle{
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--btn-border);
+  background: var(--btn-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 26px rgba(0,0,0,.18);
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.theme-toggle:hover{
+  background: var(--btn-bg-hover);
+  border-color: var(--btn-border-hover);
+  transform: translateY(-1px);
+}
+
+.theme-toggle:active{ transform: translateY(0); }
+
+.theme-toggle:focus-visible{
+  outline: 2px solid rgba(127,127,127,.45);
+  outline-offset: 3px;
+}
+
+.theme-icon{
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Nav links */
+.nav{
+  display:flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.nav-link{
+  font-size: 13px;
+  letter-spacing: .8px;
+  opacity: .92;
+  padding: 8px 6px;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.nav-link:hover{
+  opacity: 1;
+  background: rgba(127,127,127,.10);
+}
+
+/* Active nav */
+.nav-link.active{
+  background: rgba(127,127,127,.18);
+  border: 1px solid rgba(127,127,127,.22);
+  border-radius: 999px;
+}
+
+/* =========================
+   HERO / SECTIONS
+   ========================= */
+.hero{ padding-top: 10px; }
+
+.hero-media{
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.hero-media img{
+  width: 100%;
+  height: auto;
+  display:block;
+}
+
+.hero-overlay{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.55));
+}
+
+.hero-title{
+  position:absolute;
+  inset: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: clamp(28px, 4vw, 56px);
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: rgba(0,0,0,.75);
+  text-transform: uppercase;
+  text-shadow: 0 2px 10px rgba(255,255,255,.18);
+}
+
+.hero-content{
+  text-align:center;
+  padding: 28px 0 8px;
+}
+
+.hero-heading{
+  font-size: clamp(22px, 3vw, 40px);
+  margin: 0 0 14px;
+  font-weight: 800;
+}
+
+/* justify mọi màn hình, không cần lặp ở media nữa */
+.hero-text{
+  line-height: 1.8;
+  color: var(--muted);
+  font-size: 14.5px;
+  margin: 0 0 12px;
+
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: left;
+  hyphens: auto;
+}
+
+/* .section{
+  padding: 44px 0;
+  border-top: 1px solid var(--line);
+} */
+
+.section h2{
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.section p{
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+/* =========================
+   DROPDOWN SUBMENU
+   ========================= */
+.nav-item{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.has-submenu .submenu{
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 220px;
+
+  background: var(--submenu-bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.20);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: .15s ease;
+  z-index: 99999;
+}
+
+.has-submenu .submenu::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -12px;
+  width: 100%;
+  height: 12px;
+}
+
+.has-submenu:hover .submenu,
+.has-submenu:focus-within .submenu{
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.submenu a{
+  display: block;
+  padding: 10px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  letter-spacing: .2px;
+  color: var(--text);
+}
+
+.submenu a:hover{
+  background: rgba(127,127,127,.12);
+}
+
+/* =========================
+   BURGER BUTTON
+   ========================= */
+.nav-toggle{
+  display: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--btn-border);
+  background: var(--btn-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+
+  box-shadow: 0 10px 26px rgba(0,0,0,.22);
+  cursor: pointer;
+
+  position: relative;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.nav-toggle:hover{
+  background: var(--btn-bg-hover);
+  border-color: var(--btn-border-hover);
+  transform: translateY(-1px);
+}
+
+.nav-toggle:active{ transform: translateY(0); }
+
+.nav-toggle:focus-visible{
+  outline: 2px solid rgba(127,127,127,.45);
+  outline-offset: 3px;
+}
+
+/* 3 lines */
+.nav-toggle span{
+  position: absolute;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--text);
+  transition: transform .22s ease, opacity .18s ease, width .22s ease;
+  opacity: .92;
+}
+
+.nav-toggle span:nth-child(1){ transform: translateY(-6px); }
+.nav-toggle span:nth-child(2){ transform: translateY(0); width: 14px; opacity: .80; }
+.nav-toggle span:nth-child(3){ transform: translateY(6px); }
+
+.nav-toggle.is-open span:nth-child(1){
+  transform: translateY(0) rotate(45deg);
+  width: 20px;
+}
+.nav-toggle.is-open span:nth-child(2){
+  opacity: 0;
+  transform: translateY(0) scaleX(.3);
+}
+.nav-toggle.is-open span:nth-child(3){
+  transform: translateY(0) rotate(-45deg);
+  width: 20px;
+}
+
+/* =========================
+   MOBILE MENU
+   ========================= */
+@media (max-width: 720px){
+  body{ padding-top: 76px; }
+  .nav{ gap: 10px; }
+
+  .nav-toggle{ display: inline-flex; }
+
+  .nav{
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: min(320px, 92vw);
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    padding: 10px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: var(--menu-bg);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 18px 50px rgba(0,0,0,.25);
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(.98);
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+    z-index: 999;
+  }
+
+  .nav.is-open{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .nav-link{
+    padding: 10px 12px;
+    border-radius: 12px;
+    transition: background .15s ease, transform .15s ease;
+  }
+
+  .nav-link:hover{
+    background: rgba(127,127,127,.12);
+    transform: translateX(2px);
+  }
+}
+
+/* =========================
+   HERO DIRECTIONS
+   ========================= */
+.hero-subtitle{
+  text-align: left;
+  color: var(--muted);
+}
+
+.hero-directions .hero-list{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-list{
+  line-height: 1.8;
+}
+
+.hero-directions .hero-list li{
+  position: relative;
+  padding-left: 1.25rem;
+  margin: 0 0 10px 0;
+  font-size: 14.5px;
+
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: left;
+
+  hyphens: auto;
+  color: var(--muted);
+}
+
+.hero-directions .hero-list li::before{
+  content: "▶";
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  color: var(--muted);
+  font-size: 0.95em;
+  line-height: 1;
+}
+
+.hero-directions .hero-list li u{
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 800;
+  border-bottom: 2px solid rgba(127,127,127,.40);
+  padding-bottom: 2px;
+}
+
+.hero-directions .hero-list li:hover{
+  filter: brightness(1.05);
+}

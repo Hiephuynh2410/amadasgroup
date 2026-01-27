@@ -1,0 +1,54 @@
+/* css/tet.css */
+
+/* ===========================
+   Lantern decor (ONLY HERE)
+=========================== */
+.tet-fixed{
+  position: fixed;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  z-index: 9999;
+  filter: drop-shadow(0 14px 28px rgba(0,0,0,.35));
+}
+
+.tet-fixed img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tet-inner{ will-change: transform; }
+
+/* Đặt lồng đèn thấp xuống dưới header */
+#tet-lantern-left,
+#tet-lantern-right{
+  top: 90px;                 /* chỉnh số này nếu header cao hơn */
+  width: clamp(120px, 14vw, 230px);
+}
+
+#tet-lantern-left{ left: 16px; }
+#tet-lantern-right{ right: 16px; }
+
+/* wobble */
+.tet-wobble{
+  transform-origin: 50% 15%;
+  animation: tetWobble 1.8s ease-in-out infinite;
+}
+
+@keyframes tetWobble{
+  0%   { transform: rotate(-4deg) translateY(0px); }
+  50%  { transform: rotate(4deg)  translateY(-4px); }
+  100% { transform: rotate(-4deg) translateY(0px); }
+}
+
+@media (max-width: 768px){
+  #tet-lantern-left,
+  #tet-lantern-right{
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .tet-wobble{ animation: none !important; }
+}

@@ -1,0 +1,170 @@
+:root{
+  --bg: #0f0f10;
+  --panel: rgba(20,20,22,.85);
+  --text: rgba(255,255,255,.95);
+  --muted: rgba(255,255,255,.70);
+  --line: rgba(255,255,255,.10);
+}
+
+.contact{
+  padding: 36px 0 56px;
+}
+
+.contact-grid{
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.contact-left, .contact-right{
+  min-width: 0;
+}
+
+.contact-title{
+  font-size: 18px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.contact-email{
+  font-size: clamp(28px, 3.2vw, 41px);
+  line-height: 1.1;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 16px;
+  word-break: break-word;
+}
+
+.contact-card{
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.28);
+  padding: 18px;
+}
+
+.contact-person{
+  display: grid;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid;
+  margin-bottom: 12px;
+}
+
+.contact-name{
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.contact-role{
+  font-size: 13px;
+}
+
+.contact-affil{
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.contact-list{
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+  
+}
+
+.contact-list li{
+  line-height: 1.55;
+}
+
+.contact-list li::marker{
+}
+
+.k{
+  font-weight: 800;
+  margin-right: 6px;
+}
+
+.contact-actions{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(218, 209, 209, 0.14);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 14px 40px rgba(0,0,0,.28);
+}
+
+.btn:hover{
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.09);
+}
+
+.btn.ghost{
+  background: transparent;
+}
+
+.map-wrap{
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 14px 40px rgba(0,0,0,.28);
+  min-height: 420px;
+}
+
+.map-wrap iframe{
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  border: 0;
+  display: block;
+}
+
+@media (max-width: 900px){
+  .contact-grid{
+    grid-template-columns: 1fr;
+  }
+  .map-wrap{
+    min-height: 360px;
+  }
+  .map-wrap iframe{
+    min-height: 360px;
+  }
+}
+
+.contact-name-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap; /* màn nhỏ sẽ tự xuống dòng */
+}
+
+.contact-links{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Nút nhỏ gọn để nằm cạnh tên, nhưng vẫn cùng style .btn */
+.btn.btn-mini{
+  padding: 6px 10px;
+  font-size: 12px;
+}

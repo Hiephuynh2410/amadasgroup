@@ -1,0 +1,211 @@
+/* css/tet.css */
+
+.tet-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  pointer-events: none;
+  z-index: 2000;
+}
+
+.tet-fixed img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+.tet-lantern-left {
+  left: 16px;
+  top: 0;
+  width: 150px;
+}
+
+.tet-lantern-right {
+  left: auto;
+  right: 16px;
+  top: 0;
+  width: 150px;
+}
+
+.tet-inner {
+  transform-origin: top center;
+}
+
+.tet-wobble {
+  animation: tetWobble 3.2s ease-in-out infinite;
+}
+
+@keyframes tetWobble {
+  0%   { transform: rotate(-2.5deg) translateY(0); }
+  50%  { transform: rotate(2.5deg) translateY(2px); }
+  100% { transform: rotate(-2.5deg) translateY(0); }
+}
+
+/* ---------------------------
+   Popup Happy New Year (image only)
+---------------------------- */
+.tet-popup {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.45);
+
+  /* animation */
+  animation: tetFadeIn 180ms ease-out both;
+}
+
+@keyframes tetFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tet-popup.is-hiding {
+  animation: tetFadeOut 160ms ease-in both;
+}
+
+@keyframes tetFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.tet-popup__backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+/* ✅ PANEL: thu nhỏ theo màn hình + giới hạn chiều cao */
+.tet-popup__panel {
+  position: relative;
+
+  /* Nhỏ hơn hẳn so với trước (860px -> 640px) */
+  width: min(640px, 86vw);
+
+  /* không vượt quá chiều cao màn hình */
+  max-height: 78vh;
+
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+  overflow: visible;
+  z-index: 1;
+}
+
+.tet-popup__imageWrap {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+
+  /* ✅ để ảnh co theo chiều cao panel */
+  max-height: 78vh;
+}
+
+.tet-popup__imageWrap img {
+  display: block;
+  width: 100%;
+
+  /* ✅ quan trọng: không cho ảnh vượt quá màn hình */
+  max-height: 78vh;
+
+  /* giữ tỉ lệ ảnh */
+  height: auto;
+
+  /* nếu bạn muốn luôn “fit gọn” theo chiều cao thì bật thêm: */
+  object-fit: contain;
+}
+
+.tet-popup__close {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 20px;
+  line-height: 34px;
+  text-align: center;
+  z-index: 2;
+}
+
+.tet-popup__close:hover {
+  background: rgba(0,0,0,0.75);
+}
+
+/* ---------------------------
+   ✅ Responsive breakpoints
+---------------------------- */
+
+/* Mobile nhỏ */
+@media (max-width: 480px) {
+  .tet-lantern-left,
+  .tet-lantern-right {
+    width: 110px;
+  }
+
+  .tet-popup__panel {
+    width: min(320px, 86vw);
+    max-height: 70vh;
+  }
+
+  .tet-popup__imageWrap,
+  .tet-popup__imageWrap img {
+    max-height: 70vh;
+  }
+
+  .tet-popup__close {
+    top: 8px;
+    left: 8px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 18px;
+  }
+}
+
+/* Mobile lớn / Tablet dọc */
+@media (min-width: 481px) and (max-width: 768px) {
+  .tet-popup__panel {
+    width: min(420px, 82vw);
+    max-height: 72vh;
+  }
+  .tet-popup__imageWrap,
+  .tet-popup__imageWrap img {
+    max-height: 72vh;
+  }
+}
+
+/* Tablet ngang / laptop nhỏ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .tet-popup__panel {
+    width: min(520px, 74vw);
+    max-height: 74vh;
+  }
+  .tet-popup__imageWrap,
+  .tet-popup__imageWrap img {
+    max-height: 74vh;
+  }
+}
+
+/* Desktop lớn */
+@media (min-width: 1025px) {
+  .tet-popup__panel {
+    width: min(560px, 52vw);
+    max-height: 76vh;
+  }
+  .tet-popup__imageWrap,
+  .tet-popup__imageWrap img {
+    max-height: 76vh;
+  }
+}
