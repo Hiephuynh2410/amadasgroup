@@ -86,43 +86,104 @@
     return p;
   }
 
-  function setActiveNavLink() {
-    const header = document.querySelector(".site-header");
-    if (!header) return;
+  // function setActiveNavLink() {
+  //   const header = document.querySelector(".site-header");
+  //   if (!header) return;
 
-    const links = Array.from(header.querySelectorAll("a.nav-link"));
-    if (links.length === 0) return;
+  //   const links = Array.from(header.querySelectorAll("a.nav-link"));
+  //   if (links.length === 0) return;
 
-    links.forEach((a) => a.classList.remove("active"));
+  //   links.forEach((a) => a.classList.remove("active"));
 
-    const current = normPath(window.location.pathname);
+  //   const current = normPath(window.location.pathname);
 
-    // match by pathname
-    for (const a of links) {
-      const href = a.getAttribute("href");
-      if (!href) continue;
-      if (href.startsWith("#")) continue;
+  //   // match by pathname
+  //   for (const a of links) {
+  //     const href = a.getAttribute("href");
+  //     if (!href) continue;
+  //     if (href.startsWith("#")) continue;
 
-      let targetPath = "";
-      try {
-        const u = new URL(href, window.location.href);
-        targetPath = normPath(u.pathname);
-      } catch {
-        continue;
-      }
+  //     let targetPath = "";
+  //     try {
+  //       const u = new URL(href, window.location.href);
+  //       targetPath = normPath(u.pathname);
+  //     } catch {
+  //       continue;
+  //     }
 
-      if (targetPath === current) {
-        a.classList.add("active");
-        return;
-      }
+  //     if (targetPath === current) {
+  //       a.classList.add("active");
+  //       return;
+  //     }
+  //   }
+
+  //   // fallback: if home
+  //   if (current === "/") {
+  //     const home = links.find((a) => (a.getAttribute("href") || "").includes("index"));
+  //     if (home) home.classList.add("active");
+  //   }
+  // }
+const ROUTE_ALIAS = {
+  "/layout/partials/contact.html": "/team",
+  "/layout/partials/contactus.html": "/contact",
+  "/layout/publications/publication.html": "/publications",
+  "/layout/partials/scientificAdvisor.html": "/advisor",
+  "/index.html": "/",
+  "/index": "/"
+};
+
+function applyAlias(path) {
+  return ROUTE_ALIAS[path] || path;
+}
+
+function normPath(p) {
+  p = (p || "").split("?")[0].split("#")[0];
+  if (!p.startsWith("/")) p = "/" + p;
+  if (p.length > 1 && p.endsWith("/")) p = p.slice(0, -1);
+
+  if (p === "/index.html" || p === "/index") return "/";
+  if (p.endsWith("/index.html")) p = p.slice(0, -11);
+  if (p.endsWith("/index")) p = p.slice(0, -6);
+  if (p === "") p = "/";
+  return p;
+}
+
+function setActiveNavLink() {
+  const header = document.querySelector(".site-header");
+  if (!header) return;
+
+  const links = Array.from(header.querySelectorAll("a.nav-link"));
+  if (links.length === 0) return;
+
+  links.forEach((a) => a.classList.remove("active"));
+
+  // current path (có alias)
+  const current = applyAlias(normPath(window.location.pathname));
+
+  for (const a of links) {
+    const href = a.getAttribute("href");
+    if (!href) continue;
+    if (href.startsWith("#")) continue;
+
+    let targetPath = "";
+    try {
+      const u = new URL(href, window.location.href);
+      targetPath = applyAlias(normPath(u.pathname));
+    } catch {
+      continue;
     }
 
-    // fallback: if home
-    if (current === "/") {
-      const home = links.find((a) => (a.getAttribute("href") || "").includes("index"));
-      if (home) home.classList.add("active");
+    if (targetPath === current) {
+      a.classList.add("active");
+      return;
     }
   }
+
+  if (current === "/") {
+    const home = links.find((a) => applyAlias(normPath(new URL(a.href, location.href).pathname)) === "/");
+    if (home) home.classList.add("active");
+  }
+}
 
   /* ====================== LOAD CONTAINERS ====================== */
   async function loadAllContainers(root) {
