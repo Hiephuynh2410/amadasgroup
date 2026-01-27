@@ -35,7 +35,6 @@ export default async function handler(req, res) {
       ["ZADD", onlineKey, now, sid],
       ["ZREMRANGEBYSCORE", onlineKey, 0, now - windowMs],
       ["ZCARD", onlineKey],
-
       ["SET", incOnceKey, "1", "NX", "EX", 172800], 
       ["INCR", totalKey],
       ["GET", totalKey],
