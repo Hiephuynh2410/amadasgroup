@@ -169,13 +169,11 @@
       closeMenu();
     });
 
-    // click outside closes
     document.addEventListener("click", (e) => {
       if (e.target.closest && e.target.closest("#themePicker")) return;
       closeMenu();
     });
 
-    // ESC closes
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeMenu();
     });
@@ -184,18 +182,14 @@
   }
 
   function initRobust() {
-    // Try now
     if (wireUIIfReady()) return;
 
-    // Header injected async by include.js -> observe until elements appear
     const host = document.getElementById("header-container") || document.body;
     const obs = new MutationObserver(() => {
       if (wireUIIfReady()) obs.disconnect();
     });
     obs.observe(host, { childList: true, subtree: true });
 
-    // Also apply theme even before UI appears (mode persists)
-    // so page color is correct immediately
     const mode = getSavedMode();
     if (mode === "dark") setEffectiveTheme("dark");
     else if (mode === "light") setEffectiveTheme("light");
