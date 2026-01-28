@@ -1,10 +1,5 @@
 <header class="site-header">
   <div class="container nav-wrap">
-    <!-- <a class="brand" href="#home">
-      <img src="img/logo.png" alt="AMaDas Logo"
-           class="logo-amadas brand-logo"
-           style="width: 21vh; height: 50px;" />
-    </a> -->
     <a class="brand" href="#home">
       <img
         id="brandLogo"
@@ -24,15 +19,35 @@
       <a href="layout/publications/publication.html" class="nav-link">PUBLICATIONS</a>
       <a href="layout/partials/contactus.html" class="nav-link">CONTACT</a>
     </nav>
-     <div class="nav-actions">
-      <!-- Theme toggle -->
-      <button id="themeToggle" class="theme-toggle" type="button"
-              aria-label="Toggle light/dark mode"
-              aria-pressed="false"
-              title="Toggle theme">
-        <svg id="themeIcon" class="theme-icon" viewBox="0 0 24 24" aria-hidden="true"></svg>
-      </button>
 
+    <div class="nav-actions">
+      <div id="themePicker" class="theme-picker">
+        <button id="themeMenuBtn" class="theme-menu-btn" type="button"
+                aria-haspopup="menu" aria-expanded="false" aria-label="Theme settings">
+          <span id="themeMenuLabel" class="theme-menu-label">THEME</span>
+          <svg class="theme-menu-caret" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+
+        <div id="themeMenu" class="theme-menu" role="menu" aria-label="Theme mode">
+          <button class="theme-menu-item" role="menuitemradio" data-mode="system" aria-checked="false">
+            <span>System</span>
+          </button>
+          <button class="theme-menu-item" role="menuitemradio" data-mode="auto" aria-checked="false">
+            <span>Auto</span>
+          </button>
+          <button class="theme-menu-item" role="menuitemradio" data-mode="dark" aria-checked="false">
+            <span>Dark</span>
+          </button>
+          <button class="theme-menu-item" role="menuitemradio" data-mode="light" aria-checked="false">
+            <span>Light</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Burger -->
       <button id="navToggle" class="nav-toggle" type="button"
               aria-controls="siteNav"
               aria-expanded="false"

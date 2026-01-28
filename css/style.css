@@ -45,6 +45,33 @@
 }
 
 /* =========================
+   SYSTEM MODE SUPPORT
+   - Khi KHÔNG set data-theme => theo OS
+   ========================= */
+@media (prefers-color-scheme: light){
+  :root:not([data-theme]){
+    --bg: #f7f7f8;
+    --panel: #ffffff;
+    --text: #111114;
+    --muted: #3c3c40;
+    --line: rgba(0,0,0,.10);
+
+    --header-bg: rgba(255,255,255,.78);
+    --menu-bg: rgba(255,255,255,.92);
+    --submenu-bg: rgba(255,255,255,.98);
+
+    --shadow: rgba(0,0,0,.10);
+
+    --btn-bg: rgba(0,0,0,.04);
+    --btn-bg-hover: rgba(0,0,0,.07);
+    --btn-border: rgba(0,0,0,.10);
+    --btn-border-hover: rgba(0,0,0,.18);
+
+    --cursor: #111114;
+  }
+}
+
+/* =========================
    BASE
    ========================= */
 *{ box-sizing: border-box; }
@@ -100,14 +127,14 @@ main.page{
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Căn hàng trong header (1 lần thôi, không lặp nữa) */
+/* Căn hàng trong header */
 .nav-wrap{
   display:flex;
   align-items:center;
   justify-content: space-between;
   padding: 12px 0;
   gap: 16px;
-  position: relative; /* để dropdown mobile bám đúng */
+  position: relative; /* dropdown bám đúng */
 }
 
 /* Brand */
@@ -119,8 +146,6 @@ main.page{
   white-space: nowrap;
 }
 
-
-
 /* Actions (theme + burger) */
 .nav-actions{
   display: inline-flex;
@@ -128,10 +153,24 @@ main.page{
   gap: 10px;
 }
 
-/* Theme button */
-.theme-toggle{
-  width: 42px;
+/* IMPORTANT: tránh dropdown bị cắt */
+.site-header,
+.nav-wrap,
+.nav-actions,
+.theme-picker{
+  overflow: visible !important;
+}
+
+/* =========================
+   THEME PICKER (menu)
+   ========================= */
+.theme-picker{
+  position: relative;
+}
+
+.theme-menu-btn{
   height: 42px;
+  padding: 0 14px;
   border-radius: 14px;
   border: 1px solid var(--btn-border);
   background: var(--btn-bg);
@@ -142,35 +181,99 @@ main.page{
 
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
 
   transition: transform .15s ease, background .15s ease, border-color .15s ease;
 }
 
-.theme-toggle:hover{
+.theme-menu-btn:hover{
   background: var(--btn-bg-hover);
   border-color: var(--btn-border-hover);
   transform: translateY(-1px);
 }
+.theme-menu-btn:active{ transform: translateY(0); }
 
-.theme-toggle:active{ transform: translateY(0); }
-
-.theme-toggle:focus-visible{
+.theme-menu-btn:focus-visible{
   outline: 2px solid rgba(127,127,127,.45);
   outline-offset: 3px;
 }
 
-.theme-icon{
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: var(--text);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.theme-menu-label{
+  font-size: 12.5px;
+  letter-spacing: .9px;
+  font-weight: 800;
+  color: var(--text);
+  opacity: .92;
+  user-select: none;
 }
 
-/* Nav links */
+.theme-menu-caret{
+  width: 14px;
+  height: 14px;
+  opacity: .85;
+}
+
+.theme-menu{
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 240px;
+
+  background: var(--menu-bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.25);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(.98);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+  z-index: 99999;
+}
+
+.theme-picker.is-open .theme-menu{
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.theme-menu-item{
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 10px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+
+  font-size: 13px;
+  letter-spacing: .2px;
+}
+
+.theme-menu-item:hover{
+  background: rgba(127,127,127,.12);
+}
+
+.theme-menu-item[aria-checked="true"]{
+  background: rgba(127,127,127,.18);
+  border: 1px solid rgba(127,127,127,.22);
+}
+
+.theme-menu-item small{
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* =========================
+   Nav links
+   ========================= */
 .nav{
   display:flex;
   gap: 18px;
@@ -251,7 +354,6 @@ main.page{
   font-weight: 800;
 }
 
-/* justify mọi màn hình, không cần lặp ở media nữa */
 .hero-text{
   line-height: 1.8;
   color: var(--muted);
@@ -263,11 +365,6 @@ main.page{
   text-align-last: left;
   hyphens: auto;
 }
-
-/* .section{
-  padding: 44px 0;
-  border-top: 1px solid var(--line);
-} */
 
 .section h2{
   margin: 0 0 12px;
