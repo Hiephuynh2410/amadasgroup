@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/team", "destination": "/layout/partials/contact.html" },
     { "source": "/contact", "destination": "/layout/partials/contactus.html" },
+    { "source": "/blog", "destination": "/layout/blog/blog.html" },
     { "source": "/publications", "destination": "/layout/publications/publication.html" },
     { "source": "/advisor", "destination": "/layout/partials/scientificAdvisor.html" }
   ],
@@ -14,6 +15,11 @@
     {
       "source": "/layout/partials/contactus.html",
       "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/layout/blog/blog.html",
+      "destination": "/blog",
       "permanent": true
     },
     {

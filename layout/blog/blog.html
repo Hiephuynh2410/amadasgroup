@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Blog</title>
+
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="../../css/footer.css" />
+  <link rel="icon" href="../../img/favicon.ico" type="image/x-icon" />
+  <link rel="shortcut icon" href="../../img/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="../../css/blog.css" />
+</head>
+
+<body>
+  <div id="header-container"></div>
+
+  <main id="home" class="page">
+    <div class="hero-media">
+      <img src="/img/hero.png" alt="Team photo" />
+      <div class="hero-overlay"></div>
+    </div>
+
+    <section class="blog container">
+      <div class="blog-header">
+        <p class="blog-subtitle">Tin tức, bài viết, thông báo mới nhất.</p>
+      </div>
+
+      <!-- JS sẽ tự tạo bìa ở đây -->
+      <div class="blog-grid" id="blogGrid"></div>
+    </section>
+  </main>
+
+  <!-- MODAL POPUP -->
+  <div class="blog-modal" id="blogModal" aria-hidden="true">
+    <div class="blog-modal__backdrop" data-close="true"></div>
+
+    <div class="blog-modal__panel" id="modalPanel" role="dialog" aria-modal="true" aria-label="Blog post">
+      <button class="blog-modal__close" type="button" aria-label="Close" data-close="true">✕</button>
+
+      <div class="blog-modal__top">
+        <img class="blog-modal__cover" id="modalCover" alt="" />
+        <div class="blog-modal__heading">
+          <h2 class="blog-modal__title" id="modalTitle"></h2>
+          <p class="blog-modal__meta" id="modalMeta"></p>
+          <p class="blog-modal__excerpt" id="modalExcerpt"></p>
+        </div>
+      </div>
+
+      <!-- Nội dung bài viết thật nằm ở đây -->
+      <div class="blog-modal__content" id="modalContent">
+        <div class="blog-modal__body" id="modalBody"></div>
+      </div>
+    </div>
+  </div>
+    <!-- blog nè -->
+    <div id="templateblog-container"></div>
+  
+    <div id="footer-container"></div>
+
+  <script src="../../js/include.js"></script>
+  <script src="../../js/visitors.js"></script>
+  <script src="../../js/theme-toggle.js"></script>
+  <script src="../../js/scroll.js"></script>
+  <script src="../../js/app.js"></script>
+  <script src="../../js/burger.js"></script>
+
+
+ 
+  <script src="../../js/blog-modal.js"></script>
+
+</body>
+</html>

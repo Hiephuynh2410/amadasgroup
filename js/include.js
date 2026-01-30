@@ -86,46 +86,10 @@
     return p;
   }
 
-  // function setActiveNavLink() {
-  //   const header = document.querySelector(".site-header");
-  //   if (!header) return;
-
-  //   const links = Array.from(header.querySelectorAll("a.nav-link"));
-  //   if (links.length === 0) return;
-
-  //   links.forEach((a) => a.classList.remove("active"));
-
-  //   const current = normPath(window.location.pathname);
-
-  //   // match by pathname
-  //   for (const a of links) {
-  //     const href = a.getAttribute("href");
-  //     if (!href) continue;
-  //     if (href.startsWith("#")) continue;
-
-  //     let targetPath = "";
-  //     try {
-  //       const u = new URL(href, window.location.href);
-  //       targetPath = normPath(u.pathname);
-  //     } catch {
-  //       continue;
-  //     }
-
-  //     if (targetPath === current) {
-  //       a.classList.add("active");
-  //       return;
-  //     }
-  //   }
-
-  //   // fallback: if home
-  //   if (current === "/") {
-  //     const home = links.find((a) => (a.getAttribute("href") || "").includes("index"));
-  //     if (home) home.classList.add("active");
-  //   }
-  // }
 const ROUTE_ALIAS = {
   "/layout/partials/contact.html": "/team",
   "/layout/partials/contactus.html": "/contact",
+  "/layout/blog/blog.html": "/blog",
   "/layout/publications/publication.html": "/publications",
   "/layout/partials/scientificAdvisor.html": "/advisor",
   "/index.html": "/",
@@ -253,6 +217,12 @@ function setActiveNavLink() {
     const conf = document.querySelector("#conference-container");
     if (conf && !conf.innerHTML.trim())
       await loadPartial("#conference-container", p("layout/publications/conference.html"));
+
+    // blog
+    const blogs = document.querySelector("#templateblog-container");
+    if (blogs && !blogs.innerHTML.trim())
+      await loadPartial("#templateblog-container", p("layout/blog/template.html"));
+
   }
 
   /* ====================== SCRIPT LOADER (ONCE) ====================== */
