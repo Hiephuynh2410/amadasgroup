@@ -1,3 +1,31 @@
+/* =========================
+   THEME VARIABLES (ADD THIS)
+   ========================= */
+
+/* Default (coi như dark) */
+:root{
+  --pub-link: #7aa2ff;
+}
+
+/* Khi JS set data-theme */
+:root[data-theme="dark"]{
+  --pub-link: #7aa2ff;
+}
+:root[data-theme="light"]{
+  --pub-link: #1d4ed8;
+}
+
+/* Khi mode = system (JS remove data-theme), dùng prefers-color-scheme */
+@media (prefers-color-scheme: light){
+  :root:not([data-theme]){
+    --pub-link: #1d4ed8;
+  }
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme]){
+    --pub-link: #7aa2ff;
+  }
+}
 
 /* Responsive */
 @media (max-width: 640px){
@@ -99,7 +127,6 @@
   content: "P";
 }
 
-
 .pub-body{
   min-width: 0;
 }
@@ -108,9 +135,15 @@
   display: inline-block;
   font-weight: 700;
   line-height: 1.45;
-  color: #1d4ed8;   
+  color: var(--pub-link);  /* ✅ CHANGED */
   text-decoration: none;
   position: relative;
+}
+
+/* Optional: hover rõ hơn */
+.pub-link:hover{
+  text-decoration: none;
+  text-underline-offset: 3px;
 }
 
 .pub-meta{
@@ -223,8 +256,7 @@
 
 /* ===== Badge accepted ===== */
 .conf-accept{
-
-    margin-left: 8px;
+  margin-left: 8px;
   font-size: 12px;
   opacity: .8;
   padding: 2px 8px;
@@ -252,11 +284,10 @@
   font-weight: 700;
   color: #fff;
   background: #8c8f0b;
-
 }
 
 .pub-type-jounal {
-    margin-left: 8px;
+  margin-left: 8px;
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 12px;
