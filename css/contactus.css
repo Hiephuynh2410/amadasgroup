@@ -63,6 +63,7 @@
 
 .contact-role{
   font-size: 13px;
+  color: var(--muted);
 }
 
 .contact-affil{
@@ -80,6 +81,7 @@
 
 .contact-list li{
   line-height: 1.55;
+  color: var(--muted);
 }
 
 .contact-list li::marker{
