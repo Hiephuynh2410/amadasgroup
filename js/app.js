@@ -2,6 +2,44 @@
 (function () {
   "use strict";
 
+  // ✅ Auto-break khi DevTools mở (kể cả mở SAU khi trang đã load)
+  (function devtoolsBreakOnOpen() {
+    const TH = 160;          // ngưỡng chênh lệch viewport
+    const POLL_MS = 200;     // tần suất kiểm tra
+    const MAX_MS = 60000;    // chỉ theo dõi 60s (tránh chạy mãi)
+
+    function isDevtoolsOpen() {
+      return (
+        Math.abs(window.outerWidth - window.innerWidth) > TH ||
+        Math.abs(window.outerHeight - window.innerHeight) > TH
+      );
+    }
+
+    // DevTools mở sẵn lúc load
+    if (isDevtoolsOpen()) debugger;
+
+    // DevTools mở sau đó
+    const start = Date.now();
+    let fired = false;
+
+    const timer = setInterval(() => {
+      if (fired) return;
+
+      if (Date.now() - start > MAX_MS) {
+        clearInterval(timer);
+        return;
+      }
+
+      if (isDevtoolsOpen()) {
+        fired = true;
+        clearInterval(timer);
+        debugger; // ✅ mở DevTools là dừng ngay tại đây
+      }
+    }, POLL_MS);
+
+    window.addEventListener("pagehide", () => clearInterval(timer), { once: true });
+  })();
+
   if (window.__AMADAS_APP_READY__) return;
   window.__AMADAS_APP_READY__ = true;
 
@@ -43,39 +81,50 @@
   }
 
   async function boot() {
-  // load inlcude.js
-  await loadScriptOnce("amadas-include", absUrl("js/include.js"));
+    // load include.js
+    await loadScriptOnce("amadas-include", absUrl("js/include.js"));
 
-  if (typeof window.amadasIncludeInit === "function") {
-    try { await window.amadasIncludeInit(); } catch (e) { console.error(e); }
+    if (typeof window.amadasIncludeInit === "function") {
+      try {
+        await window.amadasIncludeInit();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // load burger.js
+    await loadScriptOnce("amadas-burger", absUrl("js/burger.js"));
+    if (typeof window.amadasBurgerInit === "function") {
+      try {
+        await window.amadasBurgerInit();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // load scroll.js (nếu bạn đã làm bước trước)
+    await loadScriptOnce("amadas-scroll", absUrl("js/scroll.js"));
+
+    // load tet.js (chỉ ở home)
+    // const p = (window.location.pathname || "/").replace(/\/+$/, "");
+    // const isHome = p === "" || p === "/" || p.endsWith("/index.html") || p.endsWith("/index");
+    // if (isHome) {
+    //   await loadScriptOnce("amadas-tet", absUrl("js/tet.js"));
+    //   if (typeof window.amadasTetInit === "function") {
+    //     try { await window.amadasTetInit(); } catch (e) { console.error(e); }
+    //   }
+    // }
+
+    // load theme-toggle.js
+    await loadScriptOnce("amadas-theme-mode", absUrl("js/theme-toggle.js"));
+    if (typeof window.amadasThemeModeInit === "function") {
+      try {
+        await window.amadasThemeModeInit();
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
-
-  // load burger.js
-  await loadScriptOnce("amadas-burger", absUrl("js/burger.js"));
-  if (typeof window.amadasBurgerInit === "function") {
-    try { await window.amadasBurgerInit(); } catch (e) { console.error(e); }
-  }
-
-  // load scroll.js (nếu bạn đã làm bước trước)
-  await loadScriptOnce("amadas-scroll", absUrl("js/scroll.js"));
-
-  // load tet.js (chỉ ở home)
-  // const p = (window.location.pathname || "/").replace(/\/+$/, "");
-  // const isHome = p === "" || p === "/" || p.endsWith("/index.html") || p.endsWith("/index");
-  // if (isHome) {
-  //   await loadScriptOnce("amadas-tet", absUrl("js/tet.js"));
-  //   if (typeof window.amadasTetInit === "function") {
-  //     try { await window.amadasTetInit(); } catch (e) { console.error(e); }
-  //   }
-  // }
-
-  // load theme-toggle.js
-  await loadScriptOnce("amadas-theme-mode", absUrl("js/theme-toggle.js"));
-  if (typeof window.amadasThemeModeInit === "function") {
-    try { await window.amadasThemeModeInit(); } catch (e) { console.error(e); }
-  }
-
-}
 
   const root = document.documentElement;
 
@@ -90,7 +139,8 @@
       return;
     }
 
-    const container = document.getElementById("header-container") || document.body;
+    const container =
+      document.getElementById("header-container") || document.body;
 
     const obs = new MutationObserver(() => {
       const ok =
@@ -106,7 +156,9 @@
     obs.observe(container, { childList: true, subtree: true });
 
     setTimeout(() => {
-      try { obs.disconnect(); } catch (e) {}
+      try {
+        obs.disconnect();
+      } catch (e) {}
       cb();
     }, 5000);
   }
@@ -130,7 +182,8 @@
 
     if (!logo) return;
 
-    const darkSrc = logo.getAttribute("data-logo-dark") || "/img/logo_white.png";
+    const darkSrc =
+      logo.getAttribute("data-logo-dark") || "/img/logo_white.png";
     const lightSrc = logo.getAttribute("data-logo-light") || "/img/logo.png";
 
     const nextSrc = theme === "light" ? lightSrc : darkSrc;
@@ -172,12 +225,17 @@
       setTheme(getPreferredTheme(), { save: true, onChange: onThemeChange });
 
       const mq =
-        window.matchMedia && window.matchMedia("(prefers-color-scheme: light)");
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: light)");
       if (mq && !mq.__AMADAS_THEME_MQ_BOUND__) {
         mq.__AMADAS_THEME_MQ_BOUND__ = true;
         mq.addEventListener("change", function () {
           const saved = localStorage.getItem("theme");
-          if (!saved) setTheme(getPreferredTheme(), { save: false, onChange: onThemeChange });
+          if (!saved)
+            setTheme(getPreferredTheme(), {
+              save: false,
+              onChange: onThemeChange,
+            });
         });
       }
     } else {
@@ -255,6 +313,7 @@
     main();
   }
 })();
+
 
 // // js/app.js
 // (function () {
