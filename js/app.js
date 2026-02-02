@@ -563,10 +563,6 @@
   }
 
   function installKeyGuards() {
-    // --- StackOverflow snippet (tương thích yêu cầu bạn gửi) ---
-    // Source - https://stackoverflow.com/a/28575776
-    // Posted by Sadikhasan, modified by community. See post 'Timeline' for change history
-    // Retrieved 2026-02-02, License - CC BY-SA 3.0
     if (window.jQuery && typeof window.jQuery === "function") {
       window.jQuery(document).keydown(function (event) {
         if (!__AMADAS_LOCK__) return;
