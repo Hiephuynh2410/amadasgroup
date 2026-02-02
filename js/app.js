@@ -350,36 +350,29 @@
   }
 
   async function boot() {
-    await loadScriptOnce("amadas-include", absUrl("js/include.js"));
-
-    if (typeof window.amadasIncludeInit === "function") {
-      try {
-        await window.amadasIncludeInit();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    await loadScriptOnce("amadas-burger", absUrl("js/burger.js"));
-    if (typeof window.amadasBurgerInit === "function") {
-      try {
-        await window.amadasBurgerInit();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    await loadScriptOnce("amadas-scroll", absUrl("js/scroll.js"));
-
-    await loadScriptOnce("amadas-theme-mode", absUrl("js/theme-toggle.js"));
-    if (typeof window.amadasThemeModeInit === "function") {
-      try {
-        await window.amadasThemeModeInit();
-      } catch (e) {
-        console.error(e);
-      }
-    }
+  await loadScriptOnce("amadas-include", absUrl("js/include.js"));
+  if (typeof window.amadasIncludeInit === "function") {
+    try { await window.amadasIncludeInit(); } catch (e) { console.error(e); }
   }
+
+  await loadScriptOnce("amadas-burger", absUrl("js/burger.js"));
+  if (typeof window.amadasBurgerInit === "function") {
+    try { await window.amadasBurgerInit(); } catch (e) { console.error(e); }
+  }
+
+  await loadScriptOnce("amadas-scroll", absUrl("js/scroll.js"));
+
+  await loadScriptOnce("amadas-tet", absUrl("js/tet.js"));
+  if (typeof window.amadasTetInit === "function") {
+    try { await window.amadasTetInit(); } catch (e) { console.error(e); }
+  }
+
+  await loadScriptOnce("amadas-theme-mode", absUrl("js/theme-toggle.js"));
+  if (typeof window.amadasThemeModeInit === "function") {
+    try { await window.amadasThemeModeInit(); } catch (e) { console.error(e); }
+  }
+}
+
 
   const root = document.documentElement;
 
