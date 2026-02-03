@@ -103,6 +103,7 @@
           Hành động này đang bị hạn chế để bảo vệ nội dung. Vui lòng dừng thao tác bị chặn hoặc đóng DevTools.
         </div>
         <div class="amadas-reason" id="amadasWarningReason">Lý do: —</div>
+        <div class="amadas-reason">Không sử dụng chuột phải — hay phím tắt để mở devtools</div>
         <div class="amadas-actions">
           <button class="amadas-btn ghost" id="amadasWarnClose">Đóng</button>
           <button class="amadas-btn primary" id="amadasWarnReload">Tải lại trang</button>
