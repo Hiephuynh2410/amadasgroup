@@ -499,127 +499,130 @@
       .join("");
   }
 
-  // ✅ FIX 2: signature cho inline news (không đổi thì không innerHTML lại)
   function renderHeroInlineNews(state) {
-    const wrap = document.getElementById("heroNewsInline");
-    const list = document.getElementById("heroNewsInlineList");
-    if (!wrap || !list) return;
+      const wrap = document.getElementById("heroNewsInline");
+      const list = document.getElementById("heroNewsInlineList");
+      if (!wrap || !list) return;
 
-    if (!state.templates || !state.templates.length) {
-      wrap.hidden = false;
+      const buildLine = (title, month) => {
+        const t = String(title || "").trim();
+        const m = String(month || "").trim();
+        return m ? `${m}: ${t}` : t;
+      };
 
-      const sigLoading = "__loading__";
-      if (list.dataset.sig === sigLoading) return;
-      list.dataset.sig = sigLoading;
+      const buildLineHtml = (title, monthLabel) => {
+        return `<strong class="hero-news-inline__month">${escHtml(monthLabel)}</strong> ${escHtml(title)}`;
+      };
 
-      list.innerHTML = `<div class="hero-news-inline__loading">Loading news…</div>`;
-      return;
-    }
+      const buildItemHtml = (p, onBlog) => {
+        const metaFirstRaw = String(p.meta).split("•")[0].trim();
+        const monthLabel = onBlog ? metaFirstRaw : metaFirstToMonth(metaFirstRaw);
+        const lineHtml = buildLineHtml(p.title, monthLabel);
 
-    const postsAll = state.templates
-      .map((tpl) => {
-        const title = tpl.dataset.title || "Untitled";
-        const meta = tpl.dataset.meta || "";
-        const year = extractYearFromMeta(meta);
-        const date = extractDateFromMeta(meta);
-        return { id: tpl.id, title, meta, year, date };
-      })
-      .filter((p) => Number.isFinite(p.year));
+        return `
+          <button type="button" class="hero-news-inline__item" data-post-id="${escAttr(p.id)}">
+            <span class="hero-news-inline__itemTitle">${lineHtml}</span>
+          </button>
+        `;
+      };
 
-    const inlineSig = postsAll.map((p) => `${p.id}|${p.title}|${p.meta}`).join("||");
-    if (list.dataset.sig === inlineSig) return;
-    list.dataset.sig = inlineSig;
 
-    if (!postsAll.length) {
-      wrap.hidden = true;
-      list.innerHTML = "";
-      return;
-    }
 
-    const inlineYearEl = document.getElementById("heroNewsInlineYear");
-    const onBlog = isOnBlogPage(state);
+      if (!state.templates || !state.templates.length) {
+        wrap.hidden = false;
 
-    if (Number.isFinite(state.cfg.inlineYear)) {
-      const targetYear = state.cfg.inlineYear;
-      if (inlineYearEl) inlineYearEl.textContent = String(targetYear);
+        const sigLoading = "__loading__";
+        if (list.dataset.sig === sigLoading) return;
+        list.dataset.sig = sigLoading;
 
-      const posts = postsAll.filter((p) => p.year === targetYear);
-      posts.sort((a, b) => (a.date && b.date ? b.date - a.date : a.id.localeCompare(b.id)));
+        list.innerHTML = `<div class="hero-news-inline__loading">Loading news…</div>`;
+        return;
+      }
 
-      if (!posts.length) {
+      const postsAll = state.templates
+        .map((tpl) => {
+          const title = tpl.dataset.title || "Untitled";
+          const meta = tpl.dataset.meta || "";
+          const year = extractYearFromMeta(meta);
+          const date = extractDateFromMeta(meta);
+          return { id: tpl.id, title, meta, year, date };
+        })
+        .filter((p) => Number.isFinite(p.year));
+
+      const inlineSig = postsAll.map((p) => `${p.id}|${p.title}|${p.meta}`).join("||");
+      if (list.dataset.sig === inlineSig) return;
+      list.dataset.sig = inlineSig;
+
+      if (!postsAll.length) {
+        wrap.hidden = true;
+        list.innerHTML = "";
+        return;
+      }
+
+      const inlineYearEl = document.getElementById("heroNewsInlineYear");
+      const onBlog = isOnBlogPage(state);
+
+      // ===== Case 1: fixed year (inlineYear) =====
+      if (Number.isFinite(state.cfg.inlineYear)) {
+        const targetYear = state.cfg.inlineYear;
+        if (inlineYearEl) inlineYearEl.textContent = String(targetYear);
+
+        const posts = postsAll.filter((p) => p.year === targetYear);
+        posts.sort((a, b) => (a.date && b.date ? b.date - a.date : a.id.localeCompare(b.id)));
+
+        if (!posts.length) {
+          wrap.hidden = true;
+          list.innerHTML = "";
+          return;
+        }
+
+        wrap.hidden = false;
+        list.innerHTML = posts.map((p) => buildItemHtml(p, onBlog)).join("");
+        return;
+      }
+
+      // ===== Case 2: show top 2 years =====
+      const top2 = getTopYears(state.yearInfo, 2);
+      if (inlineYearEl) inlineYearEl.textContent = formatTopYearsLabel(top2);
+
+      const yearsToShow = top2.slice();
+      const groups = new Map();
+      for (const y of yearsToShow) groups.set(y, []);
+
+      for (const p of postsAll) {
+        if (groups.has(p.year)) groups.get(p.year).push(p);
+      }
+
+      for (const y of yearsToShow) {
+        const arr = groups.get(y);
+        arr.sort((a, b) => (a.date && b.date ? b.date - a.date : a.id.localeCompare(b.id)));
+      }
+
+      const any = yearsToShow.some((y) => (groups.get(y) || []).length);
+      if (!any) {
         wrap.hidden = true;
         list.innerHTML = "";
         return;
       }
 
       wrap.hidden = false;
-      list.innerHTML = posts
-        .map((p) => {
-          const metaFirstRaw = String(p.meta).split("•")[0].trim();
-          const metaFirstShown = onBlog ? metaFirstRaw : metaFirstToMonth(metaFirstRaw);
+      list.innerHTML = yearsToShow
+        .map((y) => {
+          const arr = groups.get(y) || [];
+          if (!arr.length) return "";
+
+          const items = arr.map((p) => buildItemHtml(p, onBlog)).join("");
+
           return `
-            <button type="button" class="hero-news-inline__item" data-post-id="${escAttr(p.id)}">
-              <span class="hero-news-inline__itemTitle">${escHtml(p.title)}</span>
-              <span class="hero-news-inline__itemMeta">${escHtml(metaFirstShown)}</span>
-            </button>
+            <div class="hero-news-inline__group">
+              <div class="hero-news-inline__groupYear">${y}</div>
+              <div class="hero-news-inline__groupList">${items}</div>
+            </div>
           `;
         })
         .join("");
-
-      return;
     }
 
-    const top2 = getTopYears(state.yearInfo, 2);
-    if (inlineYearEl) inlineYearEl.textContent = formatTopYearsLabel(top2);
-
-    const yearsToShow = top2.slice();
-    const groups = new Map();
-    for (const y of yearsToShow) groups.set(y, []);
-
-    for (const p of postsAll) {
-      if (groups.has(p.year)) groups.get(p.year).push(p);
-    }
-
-    for (const y of yearsToShow) {
-      const arr = groups.get(y);
-      arr.sort((a, b) => (a.date && b.date ? b.date - a.date : a.id.localeCompare(b.id)));
-    }
-
-    const any = yearsToShow.some((y) => (groups.get(y) || []).length);
-    if (!any) {
-      wrap.hidden = true;
-      list.innerHTML = "";
-      return;
-    }
-
-    wrap.hidden = false;
-    list.innerHTML = yearsToShow
-      .map((y) => {
-        const arr = groups.get(y) || [];
-        if (!arr.length) return "";
-
-        const items = arr
-          .map((p) => {
-            const metaFirstRaw = String(p.meta).split("•")[0].trim();
-            const metaFirstShown = onBlog ? metaFirstRaw : metaFirstToMonth(metaFirstRaw);
-            return `
-              <button type="button" class="hero-news-inline__item" data-post-id="${escAttr(p.id)}">
-                <span class="hero-news-inline__itemTitle">${escHtml(p.title)}</span>
-                <span class="hero-news-inline__itemMeta">${escHtml(metaFirstShown)}</span>
-              </button>
-            `;
-          })
-          .join("");
-
-        return `
-          <div class="hero-news-inline__group">
-            <div class="hero-news-inline__groupYear">${y}</div>
-            <div class="hero-news-inline__groupList">${items}</div>
-          </div>
-        `;
-      })
-      .join("");
-  }
 
   function detectYearInfoFromTemplates(templates = []) {
     const years = (templates || [])

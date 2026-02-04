@@ -225,15 +225,8 @@
   text-overflow: ellipsis;
 }
 
-/* Date cột 3 sát phải */
-.hero-news-inline__itemMeta{
-  grid-column: 3;
-  white-space: nowrap;
-  text-align: right;
-  color: var(--muted);
-
-  font-size: 14.5px;
-  opacity: .95;
+.hero-news-inline__month {
+  margin-right: 0.5rem;
 }
 
 /* Focus keyboard */
@@ -252,9 +245,5 @@
   .hero-news-inline__itemTitle{
     white-space: normal;
   }
-  .hero-news-inline__itemMeta{
-    grid-column: 2;
-    text-align: left;
-    opacity: .85;
-  }
+
 }
