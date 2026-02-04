@@ -216,7 +216,6 @@
 .hero-news-inline__itemTitle{
   grid-column: 2;
   min-width: 0;
-  font-weight: 600;
   text-align: left;
   font-size: 14.5px;
   color: var(--muted);
@@ -234,7 +233,6 @@
   color: var(--muted);
 
   font-size: 14.5px;
-  font-weight: 600;
   opacity: .95;
 }
 
