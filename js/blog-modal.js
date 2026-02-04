@@ -829,7 +829,7 @@
     if (!parts.length) return String(meta || "");
     const d = parseDateLoose(parts[0]);
     if (!d) return String(meta || "");
-    parts[0] = d.toLocaleString("en-US", { month: "short", year: "long" }); // "Feb 2026"
+    parts[0] = d.toLocaleString("en-US", { month: "short", year: "numeric" }); // "Feb 2026"
     return parts.join(" • ");
   }
 
