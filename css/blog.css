@@ -275,34 +275,89 @@
   pointer-events: none;
 }
 
-/* top header */
+
+/* =========================
+   MODAL TOP HEADER (SHRINKED)
+   ========================= */
 .blog-modal__top{
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 14px;
-  padding: 16px 16px 12px 16px;
+  grid-template-columns: 72px 1fr; /* icon + content */
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px 10px 14px;
   border-bottom: 1px solid var(--blog-modal-top-line);
 }
-@media (max-width: 720px){ .blog-modal__top{ grid-template-columns: 1fr; } }
 
+@media (max-width: 720px){
+  .blog-modal__top{
+    grid-template-columns: 56px 1fr;
+    gap: 10px;
+    padding: 12px 12px 10px 12px;
+  }
+}
+
+/* cover -> icon */
 .blog-modal__cover{
-  width: 100%;
-  height: 140px;
+  width: 64px;
+  height: 64px;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: 14px;     /* muốn tròn hẳn: 999px */
   border: 1px solid var(--line);
 }
-.blog-modal__heading{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  min-width:0;
-}
-.blog-modal__title{ margin: 0 0 6px 0; font-size: 20px; line-height: 1.2; }
-.blog-modal__meta{ margin: 0 0 8px 0; font-size: 13px; opacity: 0.75; }
-.blog-modal__excerpt{ margin: 0; font-size: 14px; opacity: 0.9; }
 
-/* Content */
+@media (max-width: 720px){
+  .blog-modal__cover{
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+  }
+}
+
+/* heading compact */
+.blog-modal__heading{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  gap: 4px;
+}
+
+/* clamp helper */
+.blog-modal__title,
+.blog-modal__excerpt{
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.blog-modal__title{
+  margin: 0;
+  font-size: 16px;     /* nhỏ lại */
+  line-height: 1.2;
+  -webkit-line-clamp: 2; /* tối đa 2 dòng */
+}
+
+.blog-modal__meta{
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.blog-modal__excerpt{
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+  opacity: 0.85;
+  -webkit-line-clamp: 1; /* 1 dòng thôi cho gọn */
+}
+
+
+/* =========================
+   CONTENT
+   ========================= */
 .blog-modal__content{
   flex: 1;
   overflow: auto;
@@ -453,6 +508,7 @@
     background: rgba(110,231,255,.10);
   }
 }
+
 
 body.blog-modal-lock{ overflow: hidden; }
 

@@ -168,9 +168,11 @@ main.page{
   position: relative;
 }
 
+/* Button (icon version) */
 .theme-menu-btn{
   height: 42px;
-  padding: 0 14px;
+  padding: 0 12px;              /* gọn lại vì không còn chữ */
+  min-width: 46px;              /* nhìn như icon button */
   border-radius: 14px;
   border: 1px solid var(--btn-border);
   background: var(--btn-bg);
@@ -181,7 +183,8 @@ main.page{
 
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 8px;
 
   transition: transform .15s ease, background .15s ease, border-color .15s ease;
 }
@@ -198,21 +201,66 @@ main.page{
   outline-offset: 3px;
 }
 
-.theme-menu-label{
-  font-size: 12.5px;
-  letter-spacing: .9px;
-  font-weight: 800;
-  color: var(--text);
-  opacity: .92;
-  user-select: none;
+/* Icon container */
+.theme-icon{
+  position: relative;
+  width: 18px;
+  height: 18px;
+  display: inline-block;
 }
 
+/* both icons stacked */
+.theme-ico{
+  position: absolute;
+  inset: 0;
+  width: 18px;
+  height: 18px;
+  opacity: .92;
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+/* Default (dark): show moon */
+.theme-ico--sun{ opacity: 0; transform: rotate(-20deg) scale(.92); }
+.theme-ico--moon{ opacity: .95; transform: rotate(0deg) scale(1); }
+
+/* If your site sets :root[data-theme="light"] */
+:root[data-theme="light"] .theme-ico--sun{
+  opacity: .95;
+  transform: rotate(0deg) scale(1);
+}
+:root[data-theme="light"] .theme-ico--moon{
+  opacity: 0;
+  transform: rotate(20deg) scale(.92);
+}
+
+/* If no data-theme but system prefers light */
+@media (prefers-color-scheme: light){
+  :root:not([data-theme]) .theme-ico--sun{
+    opacity: .95;
+    transform: rotate(0deg) scale(1);
+  }
+  :root:not([data-theme]) .theme-ico--moon{
+    opacity: 0;
+    transform: rotate(20deg) scale(.92);
+  }
+}
+
+/* Caret */
 .theme-menu-caret{
   width: 14px;
   height: 14px;
   opacity: .85;
+  transition: transform .15s ease, opacity .15s ease;
 }
 
+/* Rotate caret when menu open */
+.theme-picker.is-open .theme-menu-caret{
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+
+/* Dropdown menu */
 .theme-menu{
   position: absolute;
   right: 0;
@@ -240,6 +288,7 @@ main.page{
   pointer-events: auto;
 }
 
+/* Menu items */
 .theme-menu-item{
   width: 100%;
   border: 0;
@@ -270,6 +319,7 @@ main.page{
   color: var(--muted);
   font-weight: 700;
 }
+
 
 /* =========================
    Nav links
@@ -605,4 +655,138 @@ main.page{
 
 .hero-directions .hero-list li:hover{
   filter: brightness(1.05);
+}
+
+
+/* =========================
+   HERO NEWS TICKER
+   ========================= */
+.hero-news{
+  margin: 16px auto 0;
+  width: 100%;
+  max-width: 1100px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 1px solid var(--line);
+  background: rgba(127,127,127,.06);
+  border-radius: 12px;
+  padding: 10px 12px;
+
+  overflow: hidden;
+}
+
+.hero-news__badge{
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .6px;
+
+  padding: 4px 8px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(127,127,127,.25);
+  background: rgba(127,127,127,.12);
+  color: var(--text);
+
+  flex: 0 0 auto;
+}
+
+.hero-news__track{
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* marquee container */
+.hero-news__marquee{
+  display: flex;
+  width: max-content;
+  gap: 18px;
+
+  /* chạy phải -> trái */
+  animation: heroMarquee 24s linear infinite;
+}
+
+/* mỗi row là 1 cụm, mình nhân đôi 2 row để loop mượt */
+.hero-news__row{
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  white-space: nowrap;
+}
+
+/* item */
+.hero-news__item{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  cursor: pointer;
+  user-select: none;
+
+  font-size: 13px;
+  color: var(--text);
+  opacity: .92;
+
+  padding: 6px 10px;
+  border-radius: 10px;
+
+  transition: background .15s ease, opacity .15s ease, transform .15s ease;
+}
+
+.hero-news__item:hover{
+  background: rgba(127,127,127,.10);
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.hero-news__item:focus-visible{
+  outline: 2px solid rgba(127,127,127,.45);
+  outline-offset: 3px;
+}
+
+.hero-news__meta{
+  opacity: .75;
+}
+
+/* dot ngăn cách */
+.hero-news__dot{
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(127,127,127,.55);
+  display: inline-block;
+}
+
+/* keyframes chạy mượt */
+@keyframes heroMarquee{
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* fallback list (ẩn mặc định) */
+.hero-news__list{
+  display: none;
+}
+
+/* Hover thì pause marquee để dễ click đọc */
+.hero-news:hover .hero-news__marquee{
+  animation-play-state: paused;
+}
+
+/* Reduce motion: tắt animation, hiện list */
+@media (prefers-reduced-motion: reduce){
+  .hero-news__marquee{
+    animation: none !important;
+  }
+  .hero-news__track{
+    display: none;
+  }
+  .hero-news__list{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }

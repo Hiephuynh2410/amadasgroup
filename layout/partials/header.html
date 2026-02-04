@@ -24,15 +24,38 @@
 
     <div class="nav-actions">
       <div id="themePicker" class="theme-picker">
-        <button id="themeMenuBtn" class="theme-menu-btn" type="button"
+        <!-- <button id="themeMenuBtn" class="theme-menu-btn" type="button"
                 aria-haspopup="menu" aria-expanded="false" aria-label="Theme settings">
           <span id="themeMenuLabel" class="theme-menu-label">THEME</span>
           <svg class="theme-menu-caret" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round"></path>
           </svg>
-        </button>
+        </button> -->
 
+         <button id="themeMenuBtn" class="theme-menu-btn theme-menu-btn--icon" type="button"
+                  aria-haspopup="menu" aria-expanded="false" aria-label="Theme settings">
+            <span class="theme-icon" aria-hidden="true">
+              <!-- Sun icon -->
+              <svg class="theme-ico theme-ico--sun" viewBox="0 0 24 24">
+                <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M5 19l1.5-1.5"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+
+              <!-- Moon icon -->
+              <svg class="theme-ico theme-ico--moon" viewBox="0 0 24 24">
+                <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </span>
+
+            <svg class="theme-menu-caret" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        </button>
+ 
         <div id="themeMenu" class="theme-menu" role="menu" aria-label="Theme mode">
           <button class="theme-menu-item" role="menuitemradio" data-mode="system" aria-checked="false">
             <span>System</span>

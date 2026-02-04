@@ -1,290 +1,43 @@
-// document.addEventListener("DOMContentLoaded", () => {
-//   const grid = document.getElementById("blogGrid");
-//   const modal = document.getElementById("blogModal");
-//   const panel = document.getElementById("modalPanel");
-//   if (!grid || !modal || !panel) return;
-
-//   const coverEl = document.getElementById("modalCover");
-//   const titleEl = document.getElementById("modalTitle");
-//   const metaEl  = document.getElementById("modalMeta");
-//   const excerptEl = document.getElementById("modalExcerpt");
-//   const bodyEl = document.getElementById("modalBody");
-
-//   const templates = Array.from(document.querySelectorAll("template.blog-post"));
-
-//   let lastActive = null;
-//   let lastThumbRect = null;
-//   let lastThumbSrc = "";
-//   let isAnimating = false;
-
-//   renderCards();
-
-//   function renderCards() {
-//     grid.innerHTML = "";
-
-//     templates.forEach((tpl) => {
-//       const title = tpl.dataset.title || "Untitled";
-//       const meta = tpl.dataset.meta || "";
-//       const cover = tpl.dataset.cover || "";
-//       const excerpt = tpl.dataset.excerpt || "";
-//       const postId = tpl.id;
-
-//       const card = document.createElement("article");
-//       card.className = "blog-card";
-//       card.tabIndex = 0;
-//       card.dataset.postId = postId;
-
-//       card.innerHTML = `
-//         <div class="blog-card__thumb">
-//           <img src="${cover}" alt="${escHtml(title)}" loading="lazy" />
-//         </div>
-//         <div class="blog-card__body">
-//           <h3 class="blog-card__title" data-full="${escAttr(title)}">${escHtml(title)}</h3>
-//           <p class="blog-card__meta" data-full="${escAttr(meta)}">${escHtml(meta)}</p>
-//           <p class="blog-card__excerpt">${escHtml(excerpt)}</p>
-//           <span class="blog-card__cta">Xem bài →</span>
-//         </div>
-//       `;
-
-//       card.addEventListener("click", () => openFromCard(card));
-//       card.addEventListener("keydown", (e) => {
-//         if (e.key === "Enter" || e.key === " ") {
-//           e.preventDefault();
-//           openFromCard(card);
-//         }
-//       });
-
-//       grid.appendChild(card);
-//     });
-//   }
-
-//   async function openFromCard(card) {
-//     if (isAnimating) return;
-//     if (modal.classList.contains("is-open")) return;
-
-//     const postId = card.dataset.postId;
-//     const tpl = document.getElementById(postId);
-//     if (!tpl) return;
-
-//     lastActive = document.activeElement;
-
-//     // Lấy rect của thumbnail (chứ không lấy rect cả card)
-//     const thumbImg = card.querySelector(".blog-card__thumb img");
-//     if (!thumbImg) return;
-
-//     lastThumbRect = thumbImg.getBoundingClientRect();
-//     lastThumbSrc = thumbImg.currentSrc || thumbImg.src;
-
-//     // Fill modal data (nhưng panel vẫn ẩn)
-//     const title = tpl.dataset.title || "Untitled";
-//     const meta = tpl.dataset.meta || "";
-//     const cover = tpl.dataset.cover || lastThumbSrc;
-//     const excerpt = tpl.dataset.excerpt || "";
-
-//     titleEl.textContent = title;
-//     metaEl.textContent = meta;
-//     excerptEl.textContent = excerpt;
-
-//     coverEl.src = cover;
-//     coverEl.alt = title;
-//     coverEl.style.display = cover ? "" : "none";
-
-//     bodyEl.innerHTML = "";
-//     bodyEl.appendChild(tpl.content.cloneNode(true));
-
-//     // Mở modal (backdrop fade), nhưng panel vẫn opacity 0
-//     modal.classList.add("is-open");
-//     modal.setAttribute("aria-hidden", "false");
-//     document.body.classList.add("blog-modal-lock");
-
-//     // Reset panel style sạch để KHÔNG flash
-//     hardResetPanelHidden();
-
-//     // Đợi layout xong để coverEl có rect đúng
-//     await nextFrame();
-//     await nextFrame();
-
-//     // Animate ghost từ thumb -> cover
-//     isAnimating = true;
-//     const ghost = createGhost(lastThumbRect, lastThumbSrc);
-
-//     const coverRect = coverEl.getBoundingClientRect();
-
-//     await animateGhost(ghost, lastThumbRect, coverRect, {
-//       fromRadius: 14,
-//       toRadius: 14,
-//       duration: 720
-//     });
-
-//     // Sau khi ghost tới nơi, hiện panel thật (không flash)
-//     panel.style.opacity = "1";
-
-//     // Xoá ghost
-//     ghost.remove();
-//     isAnimating = false;
-
-//     const closeBtn = modal.querySelector(".blog-modal__close");
-//     if (closeBtn) closeBtn.focus();
-//   }
-
-//   function requestClose() {
-//     if (isAnimating) return;
-//     if (!modal.classList.contains("is-open")) return;
-//     closeModal();
-//   }
-
-//   async function closeModal() {
-//     if (!lastThumbRect) return finalizeClose();
-
-//     isAnimating = true;
-
-//     // Tạo ghost từ cover -> thumb (để panel ẩn đi trước, không chớp)
-//     const coverRect = coverEl.getBoundingClientRect();
-//     const ghost = createGhost(coverRect, coverEl.currentSrc || coverEl.src || lastThumbSrc);
-
-//     // Ẩn panel thật ngay lập tức (tránh flash)
-//     panel.style.opacity = "0";
-
-//     await animateGhost(ghost, coverRect, lastThumbRect, {
-//       fromRadius: 14,
-//       toRadius: 14,
-//       duration: 520
-//     });
-
-//     ghost.remove();
-//     isAnimating = false;
-//     finalizeClose();
-//   }
-
-//   function finalizeClose() {
-//     modal.classList.remove("is-open");
-//     modal.setAttribute("aria-hidden", "true");
-//     document.body.classList.remove("blog-modal-lock");
-//     bodyEl.innerHTML = "";
-
-//     hardResetPanelHidden();
-
-//     if (lastActive && typeof lastActive.focus === "function") lastActive.focus();
-//   }
-
-//   function hardResetPanelHidden() {
-//     // reset panel về trạng thái chuẩn + ẩn
-//     panel.style.transition = "none";
-//     panel.style.transform = "translate(-50%, -50%)";
-//     panel.style.borderRadius = "18px";
-//     panel.style.opacity = "0";
-//     panel.getBoundingClientRect(); // force apply
-//     panel.style.transition = "";
-//   }
-
-//   function createGhost(rect, src) {
-//     const img = document.createElement("img");
-//     img.className = "blog-ghost";
-//     img.src = src;
-
-//     img.style.left = `${rect.left}px`;
-//     img.style.top = `${rect.top}px`;
-//     img.style.width = `${rect.width}px`;
-//     img.style.height = `${rect.height}px`;
-
-//     document.body.appendChild(img);
-//     return img;
-//   }
-
-//   function animateGhost(el, fromRect, toRect, opts) {
-//     const { duration, fromRadius, toRadius } = opts;
-
-//     const dx = toRect.left - fromRect.left;
-//     const dy = toRect.top - fromRect.top;
-//     const sx = toRect.width / fromRect.width;
-//     const sy = toRect.height / fromRect.height;
-
-//     // dùng transform để mượt
-//     const anim = el.animate(
-//       [
-//         {
-//           transform: "translate(0px, 0px) scale(1, 1)",
-//           borderRadius: `${fromRadius}px`,
-//           opacity: 1
-//         },
-//         {
-//           transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
-//           borderRadius: `${toRadius}px`,
-//           opacity: 1
-//         }
-//       ],
-//       {
-//         duration,
-//         easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-//         fill: "forwards"
-//       }
-//     );
-
-//     return new Promise((resolve) => {
-//       anim.onfinish = () => resolve();
-//       anim.oncancel = () => resolve();
-//     });
-//   }
-
-//   function nextFrame() {
-//     return new Promise((r) => requestAnimationFrame(() => r()));
-//   }
-
-//   // Close triggers
-//   modal.addEventListener("click", (e) => {
-//     const closeTarget = e.target.closest('[data-close="true"]');
-//     if (closeTarget) requestClose();
-//   });
-
-//   document.addEventListener("keydown", (e) => {
-//     if (e.key === "Escape" && modal.classList.contains("is-open")) requestClose();
-//   });
-
-//   function escHtml(s) {
-//     return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-//   }
-//   function escAttr(s) {
-//     return String(s)
-//       .replaceAll("&", "&amp;")
-//       .replaceAll('"', "&quot;")
-//       .replaceAll("<", "&lt;")
-//       .replaceAll(">", "&gt;");
-//   }
-// });
-
-
 document.addEventListener("DOMContentLoaded", async () => {
-  const grid = document.getElementById("blogGrid");
+  // Có thể có hoặc không tùy trang
+  const grid  = document.getElementById("blogGrid");
   const modal = document.getElementById("blogModal");
   const panel = document.getElementById("modalPanel");
-  if (!grid || !modal || !panel) return;
 
-  const coverEl = document.getElementById("modalCover");
-  const titleEl = document.getElementById("modalTitle");
-  const metaEl  = document.getElementById("modalMeta");
+  // Các element trong modal (có thể null nếu trang Home không có modal)
+  const coverEl   = document.getElementById("modalCover");
+  const titleEl   = document.getElementById("modalTitle");
+  const metaEl    = document.getElementById("modalMeta");
   const excerptEl = document.getElementById("modalExcerpt");
-  const bodyEl = document.getElementById("modalBody");
+  const bodyEl    = document.getElementById("modalBody");
 
-  let templates = [];                 // ✅ sẽ được nạp sau
+  let templates = [];
   let lastActive = null;
   let lastThumbRect = null;
   let lastThumbSrc = "";
   let isAnimating = false;
 
-  // ✅ 1) Chờ template xuất hiện (vì include load async)
+  // 1) Đợi template xuất hiện (vì include async)
   templates = await waitForTemplates(6000);
-  if (!templates.length) {
-    // nếu vẫn rỗng, bạn mở DevTools->Network coi template.html có 404 không
-    console.warn("No blog templates found. Check include path for template.html");
-    return;
+
+  // 2) Render cards nếu có blogGrid (trang Blog)
+  if (grid && templates.length) {
+    renderCards();
   }
 
-  renderCards();
+  // =========================
+  // HERO NEWS TICKER (config by IDs)
+  // Sau này chỉ cần sửa mảng ID này
+  // =========================
+  const HERO_NEWS_IDS = ["post-01", "post-02"];
+  renderHeroNewsTicker(HERO_NEWS_IDS);
 
-  // ✅ 2) Nếu sau này bạn load thêm template (SPA), auto cập nhật lại
-  // (quan trọng nếu bạn chuyển trang/partial mà không reload)
+  // 3) Nếu sau này bạn load thêm template (SPA/partials) thì refresh
   observeTemplateChanges();
 
+  // =========================
+  // TEMPLATES
+  // =========================
   function getTemplates() {
     return Array.from(document.querySelectorAll("template.blog-post"));
   }
@@ -303,15 +56,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     const container = document.getElementById("templateblog-container") || document.body;
     const mo = new MutationObserver(() => {
       const tpls = getTemplates();
-      // nếu số lượng thay đổi thì render lại
       if (tpls.length && tpls.length !== templates.length) {
         templates = tpls;
-        renderCards();
+
+        if (grid) renderCards();              // Blog page
+        renderHeroNewsTicker(HERO_NEWS_IDS);  // Home page ticker refresh
       }
     });
     mo.observe(container, { childList: true, subtree: true });
   }
 
+  // =========================
+  // BLOG GRID (cards)
+  // =========================
   function renderCards() {
     grid.innerHTML = "";
 
@@ -353,6 +110,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function openFromCard(card) {
     if (isAnimating) return;
+    if (!modal || !panel) return; // nếu trang không có modal thì thôi
     if (modal.classList.contains("is-open")) return;
 
     const postId = card.dataset.postId;
@@ -367,9 +125,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     lastThumbRect = thumbImg.getBoundingClientRect();
     lastThumbSrc = thumbImg.currentSrc || thumbImg.src;
 
+    openFromTemplate(tpl, { animate: true, thumbRect: lastThumbRect, thumbSrc: lastThumbSrc });
+  }
+
+  // =========================
+  // OPEN MODAL FROM TEMPLATE
+  // - dùng chung cho card + ticker
+  // =========================
+  async function openFromTemplate(tpl, opts = {}) {
+    if (!modal || !panel || !titleEl || !metaEl || !excerptEl || !bodyEl || !coverEl) return;
+
+    const { animate = false, thumbRect = null, thumbSrc = "" } = opts;
+
     const title = tpl.dataset.title || "Untitled";
     const meta = tpl.dataset.meta || "";
-    const cover = tpl.dataset.cover || lastThumbSrc;
+    const cover = tpl.dataset.cover || thumbSrc || "";
     const excerpt = tpl.dataset.excerpt || "";
 
     titleEl.textContent = title;
@@ -392,33 +162,121 @@ document.addEventListener("DOMContentLoaded", async () => {
     await nextFrame();
     await nextFrame();
 
-    isAnimating = true;
-    const ghost = createGhost(lastThumbRect, lastThumbSrc);
+    if (animate && thumbRect && coverEl) {
+      isAnimating = true;
+      const ghost = createGhost(thumbRect, thumbSrc || cover);
 
-    const coverRect = coverEl.getBoundingClientRect();
+      const coverRect = coverEl.getBoundingClientRect();
 
-    await animateGhost(ghost, lastThumbRect, coverRect, {
-      fromRadius: 14,
-      toRadius: 14,
-      duration: 720
-    });
+      await animateGhost(ghost, thumbRect, coverRect, {
+        fromRadius: 14,
+        toRadius: 14,
+        duration: 720
+      });
 
-    panel.style.opacity = "1";
-
-    ghost.remove();
-    isAnimating = false;
+      panel.style.opacity = "1";
+      ghost.remove();
+      isAnimating = false;
+    } else {
+      panel.style.opacity = "1";
+    }
 
     const closeBtn = modal.querySelector(".blog-modal__close");
     if (closeBtn) closeBtn.focus();
   }
 
+  // =========================
+  // HERO NEWS TICKER
+  // =========================
+  function renderHeroNewsTicker(ids) {
+    const wrap = document.getElementById("heroNews");
+    const marquee = document.getElementById("heroNewsMarquee");
+    const list = document.getElementById("heroNewsList");
+    if (!wrap || !marquee || !list) return;
+
+    const picked = ids
+      .map((id) => document.getElementById(id))
+      .filter((tpl) => tpl && tpl.tagName === "TEMPLATE");
+
+    if (!picked.length) {
+      wrap.style.display = "none";
+      return;
+    }
+    wrap.style.display = "";
+
+    const itemsHtml = picked.map((tpl, idx) => {
+      const title = tpl.dataset.title || "Untitled";
+      const meta = tpl.dataset.meta || "";
+      const dot = idx === 0 ? "" : `<span class="hero-news__dot" aria-hidden="true"></span>`;
+      return `
+        ${dot}
+        <span class="hero-news__item" role="link" tabindex="0" data-post-id="${tpl.id}">
+          <strong>${escHtml(title)}</strong>
+          <span class="hero-news__meta">${meta ? "• " + escHtml(meta) : ""}</span>
+        </span>
+      `;
+    }).join("");
+
+    // nhân đôi để chạy mượt
+    marquee.innerHTML =
+      `<div class="hero-news__row">${itemsHtml}</div>` +
+      `<div class="hero-news__row">${itemsHtml}</div>`;
+
+    // fallback list
+    list.innerHTML = picked.map((tpl) => {
+      const title = tpl.dataset.title || "Untitled";
+      const meta = tpl.dataset.meta || "";
+      return `
+        <span class="hero-news__item" role="link" tabindex="0" data-post-id="${tpl.id}">
+          <strong>${escHtml(title)}</strong>
+          <span class="hero-news__meta">${meta ? "• " + escHtml(meta) : ""}</span>
+        </span>
+      `;
+    }).join("");
+
+    // tránh bind lặp
+    if (!wrap.dataset.bound) {
+      wrap.dataset.bound = "1";
+
+      wrap.addEventListener("click", (e) => {
+        const item = e.target.closest(".hero-news__item");
+        if (!item) return;
+
+        const tpl = document.getElementById(item.dataset.postId);
+        if (!tpl) return;
+
+        lastActive = document.activeElement;
+        openFromTemplate(tpl, { animate: false });
+      });
+
+      wrap.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+
+        const item = e.target.closest(".hero-news__item");
+        if (!item) return;
+
+        e.preventDefault();
+
+        const tpl = document.getElementById(item.dataset.postId);
+        if (!tpl) return;
+
+        lastActive = document.activeElement;
+        openFromTemplate(tpl, { animate: false });
+      });
+    }
+  }
+
+  // =========================
+  // CLOSE MODAL (giữ nguyên logic của bạn)
+  // =========================
   function requestClose() {
     if (isAnimating) return;
-    if (!modal.classList.contains("is-open")) return;
+    if (!modal || !modal.classList.contains("is-open")) return;
     closeModal();
   }
 
   async function closeModal() {
+    if (!modal || !panel || !coverEl || !bodyEl) return;
     if (!lastThumbRect) return finalizeClose();
 
     isAnimating = true;
@@ -440,6 +298,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function finalizeClose() {
+    if (!modal || !panel || !bodyEl) return;
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("blog-modal-lock");
@@ -451,6 +310,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function hardResetPanelHidden() {
+    if (!panel) return;
     panel.style.transition = "none";
     panel.style.transform = "translate(-50%, -50%)";
     panel.style.borderRadius = "18px";
@@ -483,22 +343,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const anim = el.animate(
       [
-        {
-          transform: "translate(0px, 0px) scale(1, 1)",
-          borderRadius: `${fromRadius}px`,
-          opacity: 1
-        },
-        {
-          transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
-          borderRadius: `${toRadius}px`,
-          opacity: 1
-        }
+        { transform: "translate(0px, 0px) scale(1, 1)", borderRadius: `${fromRadius}px`, opacity: 1 },
+        { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, borderRadius: `${toRadius}px`, opacity: 1 }
       ],
-      {
-        duration,
-        easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-        fill: "forwards"
-      }
+      { duration, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "forwards" }
     );
 
     return new Promise((resolve) => {
@@ -515,13 +363,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     return new Promise((r) => setTimeout(r, ms));
   }
 
-  modal.addEventListener("click", (e) => {
-    const closeTarget = e.target.closest('[data-close="true"]');
-    if (closeTarget) requestClose();
-  });
+  // close events (chỉ khi có modal)
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      const closeTarget = e.target.closest('[data-close="true"]');
+      if (closeTarget) requestClose();
+    });
+  }
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("is-open")) requestClose();
+    if (e.key === "Escape" && modal && modal.classList.contains("is-open")) requestClose();
   });
 
   function escHtml(s) {

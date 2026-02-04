@@ -4,7 +4,7 @@
 
   const __AMADAS_URL__ = new URL(window.location.href);
   // ẩn này để truy cập devtoool
-  // const __AMADAS_LOCK__ = __AMADAS_URL__.searchParams.get("unlock") !== "1";
+  const __AMADAS_LOCK__ = __AMADAS_URL__.searchParams.get("unlock") !== "1";
 
   // State
   let __AMADAS_DEVTOOLS_OPEN__ = false;
