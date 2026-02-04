@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <h3 class="blog-card__title" data-full="${escAttr(title)}">${escHtml(title)}</h3>
           <p class="blog-card__meta" data-full="${escAttr(meta)}">${escHtml(meta)}</p>
           <p class="blog-card__excerpt">${escHtml(excerpt)}</p>
-          <span class="blog-card__cta">Xem bài →</span>
+          <span class="blog-card__cta">Read more →</span>
         </div>
       `;
 
