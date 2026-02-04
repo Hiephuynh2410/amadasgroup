@@ -1,8 +1,21 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  // =========================
+  // 0) OPTIONAL: wait includePartials() finish (from app.js)
+  // =========================
+  await waitForIncludes();
+
+  // =========================
+  // 1) Query DOM again AFTER includes
+  // =========================
   // Có thể có hoặc không tùy trang
   const grid  = document.getElementById("blogGrid");
   const modal = document.getElementById("blogModal");
   const panel = document.getElementById("modalPanel");
+
+  // Ticker (Home)
+  const heroWrap    = document.getElementById("heroNews");
+  const heroMarquee = document.getElementById("heroNewsMarquee");
+  const heroList    = document.getElementById("heroNewsList");
 
   // Các element trong modal (có thể null nếu trang Home không có modal)
   const coverEl   = document.getElementById("modalCover");
@@ -17,23 +30,67 @@ document.addEventListener("DOMContentLoaded", async () => {
   let lastThumbSrc = "";
   let isAnimating = false;
 
-  // 1) Đợi template xuất hiện (vì include async)
-  templates = await waitForTemplates(6000);
-
-  // 2) Render cards nếu có blogGrid (trang Blog)
-  if (grid && templates.length) {
-    renderCards();
-  }
-
-  // =========================
-  // HERO NEWS TICKER (config by IDs)
-  // Sau này chỉ cần sửa mảng ID này
-  // =========================
+  // ✅ Sau này muốn thêm bài chỉ sửa mảng này
   const HERO_NEWS_IDS = ["post-01", "post-02"];
+
+  console.group("[BLOG] init (after includes)");
+  console.log("path:", location.pathname);
+  console.log("grid:", !!grid, "modal:", !!modal, "panel:", !!panel);
+  console.log("heroNews:", !!heroWrap, "marquee:", !!heroMarquee, "list:", !!heroList);
+  console.log("HERO_NEWS_IDS:", HERO_NEWS_IDS);
+  console.groupEnd();
+
+  // =========================
+  // 2) Wait templates exist (templateblog.html include)
+  // =========================
+  templates = await waitForTemplates(12000);
+
+  console.group("[BLOG] templates");
+  console.log("count:", templates.length);
+  console.log("ids:", templates.map(t => t.id));
+  console.groupEnd();
+
+  // 3) Render cards nếu có blogGrid (Blog page)
+  if (grid && templates.length) renderCards();
+
+  // 4) Render ticker (Home page)
   renderHeroNewsTicker(HERO_NEWS_IDS);
 
-  // 3) Nếu sau này bạn load thêm template (SPA/partials) thì refresh
+  // 5) Observe changes: nếu include thêm templates sau đó
   observeTemplateChanges();
+
+  // =========================
+  // INCLUDES WAIT
+  // =========================
+  async function waitForIncludes(timeoutMs = 8000) {
+    const start = performance.now();
+
+    // Nếu app.js có includePartials thì gọi để đảm bảo include xong
+    if (typeof includePartials === "function") {
+      console.log("[INCLUDE] includePartials() detected => running...");
+      try { await includePartials(); }
+      catch (e) { console.warn("[INCLUDE] includePartials error:", e); }
+    } else {
+      console.warn("[INCLUDE] includePartials() not found. Ensure app.js loaded before blog-modal.js");
+    }
+
+    // Sau khi gọi includePartials, vẫn có thể DOM chưa kịp update nếu fetch chậm
+    // -> chờ các container có nội dung thật (hero + templateblog)
+    while (performance.now() - start < timeoutMs) {
+      const heroOk = !!document.getElementById("heroNews"); // hero đã vào DOM
+      const tplOk  = document.querySelectorAll("template.blog-post").length > 0
+                  || !!document.getElementById("templateblog-container"); // container có tồn tại
+
+      if (heroOk || tplOk) {
+        console.log("[INCLUDE] DOM seems ready (heroOk:", heroOk, "tplOrContainerOk:", tplOk, ")");
+        return true;
+      }
+      await sleep(80);
+    }
+
+    console.warn("[INCLUDE] timeout waiting included DOM. Still proceed.");
+    return false;
+  }
 
   // =========================
   // TEMPLATES
@@ -42,13 +99,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return Array.from(document.querySelectorAll("template.blog-post"));
   }
 
-  async function waitForTemplates(timeoutMs = 4000) {
+  async function waitForTemplates(timeoutMs = 6000) {
     const start = performance.now();
     while (performance.now() - start < timeoutMs) {
       const tpls = getTemplates();
       if (tpls.length) return tpls;
-      await sleep(60);
+      await sleep(100);
     }
+    console.warn("[BLOG] timeout: templates not found. Home page must include templateblog.html");
     return [];
   }
 
@@ -59,8 +117,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (tpls.length && tpls.length !== templates.length) {
         templates = tpls;
 
-        if (grid) renderCards();              // Blog page
-        renderHeroNewsTicker(HERO_NEWS_IDS);  // Home page ticker refresh
+        console.group("[BLOG] templates updated");
+        console.log("count:", templates.length);
+        console.log("ids:", templates.map(t => t.id));
+        console.groupEnd();
+
+        if (grid) renderCards();
+        renderHeroNewsTicker(HERO_NEWS_IDS);
       }
     });
     mo.observe(container, { childList: true, subtree: true });
@@ -70,6 +133,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // BLOG GRID (cards)
   // =========================
   function renderCards() {
+    if (!grid) return;
     grid.innerHTML = "";
 
     templates.forEach((tpl) => {
@@ -110,7 +174,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function openFromCard(card) {
     if (isAnimating) return;
-    if (!modal || !panel) return; // nếu trang không có modal thì thôi
+    if (!modal || !panel) return;
     if (modal.classList.contains("is-open")) return;
 
     const postId = card.dataset.postId;
@@ -130,10 +194,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // =========================
   // OPEN MODAL FROM TEMPLATE
-  // - dùng chung cho card + ticker
   // =========================
   async function openFromTemplate(tpl, opts = {}) {
-    if (!modal || !panel || !titleEl || !metaEl || !excerptEl || !bodyEl || !coverEl) return;
+    if (!modal || !panel || !titleEl || !metaEl || !excerptEl || !bodyEl || !coverEl) {
+      console.warn("[BLOG] modal elements missing on this page");
+      return;
+    }
 
     const { animate = false, thumbRect = null, thumbSrc = "" } = opts;
 
@@ -165,7 +231,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (animate && thumbRect && coverEl) {
       isAnimating = true;
       const ghost = createGhost(thumbRect, thumbSrc || cover);
-
       const coverRect = coverEl.getBoundingClientRect();
 
       await animateGhost(ghost, thumbRect, coverRect, {
@@ -186,25 +251,44 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // =========================
-  // HERO NEWS TICKER
+  // HERO NEWS TICKER + LOG
   // =========================
   function renderHeroNewsTicker(ids) {
+    // ✅ re-query hero DOM in case it was injected later
     const wrap = document.getElementById("heroNews");
     const marquee = document.getElementById("heroNewsMarquee");
     const list = document.getElementById("heroNewsList");
-    if (!wrap || !marquee || !list) return;
 
-    const picked = ids
-      .map((id) => document.getElementById(id))
-      .filter((tpl) => tpl && tpl.tagName === "TEMPLATE");
-
-    if (!picked.length) {
-      wrap.style.display = "none";
+    if (!wrap || !marquee || !list) {
+      console.warn("[HERO-NEWS] hero elements not found (wrap/marquee/list). Is hero.html included?");
       return;
     }
-    wrap.style.display = "";
 
-    const itemsHtml = picked.map((tpl, idx) => {
+    const found = [];
+    const missing = [];
+
+    ids.forEach((id) => {
+      const tpl = document.getElementById(id);
+      if (tpl && tpl.tagName === "TEMPLATE") found.push(tpl);
+      else missing.push(id);
+    });
+
+    console.group("[HERO-NEWS] resolve");
+    console.log("found:", found.map(t => t.id));
+    console.log("missing:", missing);
+    console.groupEnd();
+
+    if (!found.length) {
+      wrap.hidden = false;
+      marquee.innerHTML =
+        `<div class="hero-news__row"><span class="hero-news__item">No announcements. Check templateblog include + IDs.</span></div>`;
+      list.innerHTML = "";
+      return;
+    }
+
+    wrap.hidden = false;
+
+    const itemsHtml = found.map((tpl, idx) => {
       const title = tpl.dataset.title || "Untitled";
       const meta = tpl.dataset.meta || "";
       const dot = idx === 0 ? "" : `<span class="hero-news__dot" aria-hidden="true"></span>`;
@@ -217,13 +301,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       `;
     }).join("");
 
-    // nhân đôi để chạy mượt
     marquee.innerHTML =
       `<div class="hero-news__row">${itemsHtml}</div>` +
       `<div class="hero-news__row">${itemsHtml}</div>`;
 
-    // fallback list
-    list.innerHTML = picked.map((tpl) => {
+    list.innerHTML = found.map((tpl) => {
       const title = tpl.dataset.title || "Untitled";
       const meta = tpl.dataset.meta || "";
       return `
@@ -234,7 +316,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       `;
     }).join("");
 
-    // tránh bind lặp
+    // bind 1 lần
     if (!wrap.dataset.bound) {
       wrap.dataset.bound = "1";
 
@@ -267,7 +349,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // =========================
-  // CLOSE MODAL (giữ nguyên logic của bạn)
+  // CLOSE MODAL
   // =========================
   function requestClose() {
     if (isAnimating) return;
@@ -303,9 +385,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("blog-modal-lock");
     bodyEl.innerHTML = "";
-
     hardResetPanelHidden();
-
     if (lastActive && typeof lastActive.focus === "function") lastActive.focus();
   }
 
@@ -323,19 +403,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const img = document.createElement("img");
     img.className = "blog-ghost";
     img.src = src;
-
     img.style.left = `${rect.left}px`;
     img.style.top = `${rect.top}px`;
     img.style.width = `${rect.width}px`;
     img.style.height = `${rect.height}px`;
-
     document.body.appendChild(img);
     return img;
   }
 
   function animateGhost(el, fromRect, toRect, opts) {
     const { duration, fromRadius, toRadius } = opts;
-
     const dx = toRect.left - fromRect.left;
     const dy = toRect.top - fromRect.top;
     const sx = toRect.width / fromRect.width;
@@ -343,8 +420,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const anim = el.animate(
       [
-        { transform: "translate(0px, 0px) scale(1, 1)", borderRadius: `${fromRadius}px`, opacity: 1 },
-        { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, borderRadius: `${toRadius}px`, opacity: 1 }
+        { transform: "translate(0px,0px) scale(1,1)", borderRadius: `${fromRadius}px`, opacity: 1 },
+        { transform: `translate(${dx}px,${dy}px) scale(${sx},${sy})`, borderRadius: `${toRadius}px`, opacity: 1 }
       ],
       { duration, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "forwards" }
     );
@@ -363,7 +440,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return new Promise((r) => setTimeout(r, ms));
   }
 
-  // close events (chỉ khi có modal)
   if (modal) {
     modal.addEventListener("click", (e) => {
       const closeTarget = e.target.closest('[data-close="true"]');
@@ -378,6 +454,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function escHtml(s) {
     return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   }
+
   function escAttr(s) {
     return String(s)
       .replaceAll("&", "&amp;")

@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="css/tet.css">
   <link rel="stylesheet" href="css/popuptet.css">
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
 
   <link rel="stylesheet" href="https://unpkg.com/kursor/dist/kursor.css">
   <link rel="preload" as="image" href="img/happynewyear.png">
@@ -28,17 +27,17 @@
 </head>
 
 <body>
-   <!-- <canvas id="snow-canvas"></canvas> -->
-  <div id="header-container"></div>
+  <div id="header-container" data-include="/partials/header.html"></div>
 
   <main id="home" class="page">
-    <div id="hero-container"></div>
+    <div id="hero-container" data-include="/partials/hero.html"></div>
+    <div id="templateblog-container" data-include="/partials/templateblog.html"></div>
   </main>
 
-  <div id="footer-container"></div>
-  <script src="js/app.js"></script>
-  <script src="js/visitors.js"></script>
-  <script src="js/blog-modal.js"></script>
+  <div id="footer-container" data-include="/partials/footer.html"></div>
 
+  <script src="js/app.js"></script>
+  <!-- <script src="js/visitors.js"></script> -->
+  <script src="js/blog-modal.js"></script>
 </body>
 </html>
