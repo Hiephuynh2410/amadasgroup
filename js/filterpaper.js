@@ -14,6 +14,12 @@
   }
   window.__AMADAS_FILTERPAPER__ = true;
 
+  const STATE = {
+    collapsedYears: new Set(),
+    openYearKey: "",          
+    initedDefault: false,  
+  };
+
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
@@ -80,8 +86,9 @@
   }
 
   function getYearsFromItems(items) {
-    const years = Array.from(new Set(items.map(li => normYear(li.dataset.year)).filter(Boolean)))
-      .sort((a, b) => Number(b) - Number(a));
+    const years = Array.from(
+      new Set(items.map(li => normYear(li.dataset.year)).filter(Boolean))
+    ).sort((a, b) => Number(b) - Number(a));
     return years;
   }
 
@@ -101,6 +108,37 @@
       else u.searchParams.set("year", year);
       history.replaceState(history.state, "", u.pathname + u.search + u.hash);
     } catch {}
+  }
+
+  function getDefaultOpenYearKey(years) {
+    const now = new Date().getFullYear();
+    const nowKey = String(now);
+    if (years.includes(nowKey)) return nowKey;
+    return years[0] || nowKey;
+  }
+
+  function initDefaultCollapse(years, openYearKey) {
+    // prune key cũ
+    for (const k of Array.from(STATE.collapsedYears)) {
+      if (!years.includes(k)) STATE.collapsedYears.delete(k);
+    }
+
+    if (STATE.initedDefault) return;
+
+    STATE.collapsedYears.clear();
+    for (const y of years) {
+      if (y !== openYearKey) STATE.collapsedYears.add(y);
+    }
+    STATE.initedDefault = true;
+  }
+
+  function syncCollapsedUI(sectionsEl) {
+    const secs = $$(".pub-year-section", sectionsEl);
+    for (const sec of secs) {
+      const y = sec.dataset.year;
+      if (!y) continue;
+      sec.classList.toggle("pub-collapsed", STATE.collapsedYears.has(y));
+    }
   }
 
   function buildUI() {
@@ -132,11 +170,13 @@
       return false;
     }
 
-    // clear host + dựng layout
+    STATE.openYearKey = getDefaultOpenYearKey(years);
+    initDefaultCollapse(years, STATE.openYearKey);
+    log("Default openYearKey =", STATE.openYearKey, "| collapsedYears =", Array.from(STATE.collapsedYears));
+
     host.innerHTML = "";
     host.dataset.built = "1";
 
-    // Filter top
     const top = document.createElement("div");
     top.className = "pub-filter-top";
 
@@ -165,13 +205,9 @@
       opt.textContent = y;
       sel.appendChild(opt);
     }
-
-    // Sections container
     const sections = document.createElement("div");
     sections.className = "pub-year-sections";
     host.appendChild(sections);
-
-    // group items by year
     const byYear = new Map();
     for (const it of srcItems) {
       const y = normYear(it.dataset.year);
@@ -180,13 +216,14 @@
       byYear.get(y).push(it);
     }
 
-    // render sections
     for (const y of years) {
       const items = byYear.get(y) || [];
 
       const sec = document.createElement("section");
       sec.className = "pub-year-section";
       sec.dataset.year = y;
+
+      if (STATE.collapsedYears.has(y)) sec.classList.add("pub-collapsed");
 
       const header = document.createElement("div");
       header.className = "pub-year-header";
@@ -214,11 +251,15 @@
 
       toggle.addEventListener("click", () => {
         sec.classList.toggle("pub-collapsed");
-        log("Toggle year", y, "collapsed =", sec.classList.contains("pub-collapsed"));
+        const collapsed = sec.classList.contains("pub-collapsed");
+
+        if (collapsed) STATE.collapsedYears.add(y);
+        else STATE.collapsedYears.delete(y);
+
+        log("Toggle year", y, "collapsed =", collapsed, "| collapsedYears =", Array.from(STATE.collapsedYears));
       });
     }
 
-    // Hide source list (keep in DOM)
     list.style.display = "none";
     list.setAttribute("aria-hidden", "true");
 
@@ -231,19 +272,34 @@
       const secs = $$(".pub-year-section", sections);
 
       let shown = 0;
-      for (const s of secs) {
-        const match = (y === "all") || (s.dataset.year === y);
-        s.hidden = !match;
-        if (match) shown++;
+
+      if (y === "all") {
+        for (const s of secs) {
+          s.hidden = false;
+          shown++;
+        }
+
+        syncCollapsedUI(sections);
+      } else {
+        for (const s of secs) {
+          const match = (s.dataset.year === y);
+          s.hidden = !match;
+          if (match) {
+            shown++;
+            s.classList.remove("pub-collapsed");   // auto mở
+            STATE.collapsedYears.delete(y);        // đảm bảo lưu trạng thái mở
+          }
+        }
       }
 
       setYearToUrl(y);
 
-      // LOG CẦN THIẾT KHI BẠN BẤM LỌC
       log("Apply filter:", {
         selectedYear: y,
         totalSections: secs.length,
-        shownSections: shown
+        shownSections: shown,
+        openYearKey: STATE.openYearKey,
+        collapsedYears: Array.from(STATE.collapsedYears)
       });
     }
 
@@ -253,6 +309,11 @@
     });
 
     applyFilter(initial);
+
+    if (initial === "all") {
+      syncCollapsedUI(sections);
+    }
+
     return true;
   }
 
@@ -268,7 +329,6 @@
     boot();
   }
 
-  // nếu bạn có SPA bắn event này
   window.addEventListener("amadas:spa:rendered", () => {
     log("Event: amadas:spa:rendered");
     // cho chạy lại nếu host bị thay DOM
@@ -277,7 +337,6 @@
     boot();
   });
 
-  // fallback: nếu DOM thay đổi mà chưa build
   const mo = new MutationObserver(() => {
     const host = document.getElementById("pubYearGroups");
     const list = document.getElementById("pubAllList");
