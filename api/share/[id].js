@@ -1,6 +1,5 @@
 const SITE_ORIGIN = "https://amadas.vercel.app";
 const BLOG_PATH = "/layout/blog/blog.html";
-// Nếu thực tế bạn truy cập blog là /blog thì đổi BLOG_PATH = "/blog";
 
 const POSTS = {
   "post-01": {
@@ -40,8 +39,6 @@ function escHtml(s = "") {
 }
 
 module.exports = (req, res) => {
-  // Vercel dynamic route: /api/share/<id>
-  // req.query.id có thể là string hoặc array
   const raw = req.query && req.query.id ? req.query.id : "";
   const idRaw = Array.isArray(raw) ? raw[0] : String(raw || "");
   const id = decodeURIComponent(idRaw).trim();
@@ -49,13 +46,10 @@ module.exports = (req, res) => {
   const safeId = POSTS[id] ? id : "post-01";
   const post = POSTS[safeId];
 
-  // Người dùng bấm vào preview → vào đây (không phải crawler) → redirect về blog + mở popup
   const redirectUrl = `${SITE_ORIGIN}${BLOG_PATH}?post=${encodeURIComponent(safeId)}`;
 
-  // URL đang được share để Facebook crawl OG (canonical share url)
   const shareUrl = `${SITE_ORIGIN}/api/share/${encodeURIComponent(safeId)}`;
 
-  // Nếu là crawler -> trả HTML có OG meta riêng (KHÔNG redirect trong HTML)
   if (isCrawler(req.headers["user-agent"])) {
     const html = `<!doctype html>
 <html lang="vi">
@@ -85,13 +79,11 @@ module.exports = (req, res) => {
 </html>`;
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
-    // Cache nhẹ để bạn còn sửa title/ảnh mà FB cập nhật được
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=60, must-revalidate");
     res.status(200).send(html);
     return;
   }
 
-  // Người dùng thường -> redirect thẳng về blog + popup
   res.setHeader("Cache-Control", "no-store");
   res.status(302).setHeader("Location", redirectUrl).end();
 };
