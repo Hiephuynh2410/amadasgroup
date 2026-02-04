@@ -2,18 +2,18 @@
 (function () {
   "use strict";
 
-  const __AMADAS_URL__ = new URL(window.location.href);
+  // const __AMADAS_URL__ = new URL(window.location.href);
 
-  // Detect mobile / touch device (an toàn hơn userAgent)
-  const __AMADAS_IS_MOBILE__ =
-    (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) ||
-    (window.matchMedia && window.matchMedia("(max-width: 768px)").matches);
+  // // Detect mobile / touch device (an toàn hơn userAgent)
+  // const __AMADAS_IS_MOBILE__ =
+  //   (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) ||
+  //   (window.matchMedia && window.matchMedia("(max-width: 768px)").matches);
 
-  //  Chỉ khóa trên desktop, mobile thì không khóa
-  const __AMADAS_LOCK__ = !__AMADAS_IS_MOBILE__ && (__AMADAS_URL__.searchParams.get("unlock") !== "1");
-  // State
-  let __AMADAS_DEVTOOLS_OPEN__ = false;
-  let __AMADAS_OVERLAY_VISIBLE__ = false;
+  // //  Chỉ khóa trên desktop, mobile thì không khóa
+  // const __AMADAS_LOCK__ = !__AMADAS_IS_MOBILE__ && (__AMADAS_URL__.searchParams.get("unlock") !== "1");
+  // // State
+  // let __AMADAS_DEVTOOLS_OPEN__ = false;
+  // let __AMADAS_OVERLAY_VISIBLE__ = false;
 
   function domReady(cb) {
     if (document.readyState === "loading") {
@@ -312,15 +312,9 @@
     installDevtoolsDetect();
   });
 
-  // =========================
-  // GUARD: tránh init nhiều lần (phần app chính)
-  // =========================
   if (window.__AMADAS_APP_READY__) return;
   window.__AMADAS_APP_READY__ = true;
 
-  /* =========================
-   * BOOT: load include.js trước
-   * ========================= */
   function getRootPrefixFromPath(pathname) {
     let path = (pathname || "/").split("?")[0].split("#")[0];
     const parts = path.split("/").filter(Boolean);
@@ -355,30 +349,58 @@
     });
   }
 
-  async function boot() {
-  await loadScriptOnce("amadas-include", absUrl("js/include.js"));
-  if (typeof window.amadasIncludeInit === "function") {
-    try { await window.amadasIncludeInit(); } catch (e) { console.error(e); }
-  }
+  // async function boot() {
+  //   await loadScriptOnce("amadas-include", absUrl("js/include.js"));
+  //   if (typeof window.amadasIncludeInit === "function") {
+  //     try { await window.amadasIncludeInit(); } catch (e) { console.error(e); }
+  //   }
 
-  await loadScriptOnce("amadas-burger", absUrl("js/burger.js"));
-  if (typeof window.amadasBurgerInit === "function") {
-    try { await window.amadasBurgerInit(); } catch (e) { console.error(e); }
-  }
+  //   await loadScriptOnce("amadas-burger", absUrl("js/burger.js"));
+  //   if (typeof window.amadasBurgerInit === "function") {
+  //     try { await window.amadasBurgerInit(); } catch (e) { console.error(e); }
+  //   }
 
-  await loadScriptOnce("amadas-scroll", absUrl("js/scroll.js"));
+  //   await loadScriptOnce("amadas-scroll", absUrl("js/scroll.js"));
 
-  await loadScriptOnce("amadas-tet", absUrl("js/tet.js"));
-  if (typeof window.amadasTetInit === "function") {
-    try { await window.amadasTetInit(); } catch (e) { console.error(e); }
-  }
+  //   await loadScriptOnce("amadas-tet", absUrl("js/tet.js"));
+  //   if (typeof window.amadasTetInit === "function") {
+  //     try { await window.amadasTetInit(); } catch (e) { console.error(e); }
+  //   }
 
-  await loadScriptOnce("amadas-theme-mode", absUrl("js/theme-toggle.js"));
-  if (typeof window.amadasThemeModeInit === "function") {
-    try { await window.amadasThemeModeInit(); } catch (e) { console.error(e); }
-  }
-}
+  //   await loadScriptOnce("amadas-theme-mode", absUrl("js/theme-toggle.js"));
+  //   if (typeof window.amadasThemeModeInit === "function") {
+  //     try { await window.amadasThemeModeInit(); } catch (e) { console.error(e); }
+  //   }
+  // }
 
+    async function boot() {
+      await loadScriptOnce("amadas-include", absUrl("js/include.js"));
+      if (typeof window.amadasIncludeInit === "function") {
+        try { await window.amadasIncludeInit(); } catch (e) { console.error(e); }
+      }
+
+      await loadScriptOnce("amadas-burger", absUrl("js/burger.js"));
+      if (typeof window.amadasBurgerInit === "function") {
+        try { await window.amadasBurgerInit(); } catch (e) { console.error(e); }
+      }
+
+      await loadScriptOnce("amadas-scroll", absUrl("js/scroll.js"));
+
+      await loadScriptOnce("amadas-tet", absUrl("js/tet.js"));
+      if (typeof window.amadasTetInit === "function") {
+        try { await window.amadasTetInit(); } catch (e) { console.error(e); }
+      }
+
+      await loadScriptOnce("amadas-theme-mode", absUrl("js/theme-toggle.js"));
+      if (typeof window.amadasThemeModeInit === "function") {
+        try { await window.amadasThemeModeInit(); } catch (e) { console.error(e); }
+      }
+
+      await loadScriptOnce("amadas-blog-modal", absUrl("js/blog-modal.js"));
+      if (typeof window.amadasBlogModalInit === "function") {
+        await window.amadasBlogModalInit({ });
+      }
+    }
 
   const root = document.documentElement;
 

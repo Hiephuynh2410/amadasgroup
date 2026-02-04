@@ -1,7 +1,6 @@
 /* =========================
    BLOG LAYOUT
    ========================= */
-.blog.container { padding: 48px 0; }
 .blog-header { margin-bottom: 18px; }
 .blog-title { font-size: 34px; line-height: 1.15; margin: 0 0 6px 0; }
 .blog-subtitle { margin: 0; opacity: 0.8; }
@@ -105,7 +104,7 @@
   gap: 14px;
   align-items: center;
 
-  padding: 14px;
+  padding: 9px;
   border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
@@ -125,8 +124,8 @@
 
 /* Left thumbnail box */
 .blog-card__left{
-  width: 96px;
-  height: 96px;
+  width: 50px;
+  height: 50px;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--blog-card-border);
@@ -158,7 +157,7 @@
   margin: 0 0 6px 0;
   font-size: 18px;
   line-height: 1.25;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 /* Meta */
@@ -405,8 +404,6 @@
 }
 
 .blog-modal__body .post-meta{
-  display: flex;
-  justify-content: space-between;
   margin-bottom: 16px;
   color: var(--blog-post-muted);
   font-size: 13px;
@@ -562,24 +559,7 @@ body.blog-modal-lock{ overflow: hidden; }
   color: var(--blog-post-muted);
 }
 
- .post-footer{
-    display:flex;
-    gap:12px;
-    align-items:center;
-    flex-wrap:wrap;
-    margin-top: 12px;
-  }
-
-  .share-facebook{
-    padding:8px 12px;
-    border:1px solid #e5e5e5;
-    border-radius:10px;
-    background:#fff;
-    cursor:pointer;
-    font-size:14px;
-    line-height:1;
-  }
-
-  .share-facebook:hover{
-    border-color:#cfcfcf;
-  }
+.blog-card__spacer {
+  display: flex;
+  justify-content: space-between;
+}
