@@ -1,12 +1,4 @@
-// api/share/[id].js
-// Vercel Serverless Function: /api/share/<id>
-// - Facebook/OG bot: trả HTML có OG meta riêng cho bài viết (preview đẹp)
-// - Người dùng thường: redirect về trang blog + ?post=<id> để mở popup
-
-const SITE_ORIGIN = "https://amadas.vercel.app"; // đổi nếu domain khác
-
-// ĐƯỜNG DẪN BLOG THỰC TẾ CỦA BẠN
-// Nếu deploy giữ nguyên cấu trúc thư mục như local, blog.html sẽ là:
+const SITE_ORIGIN = "https://amadas.vercel.app";
 const BLOG_PATH = "/layout/blog/blog.html";
 // Nếu thực tế bạn truy cập blog là /blog thì đổi BLOG_PATH = "/blog";
 
@@ -21,6 +13,12 @@ const POSTS = {
     title: "Research Highlights and Academic Activities – Jan 2026",
     description:
       "In January 2026, the research group recorded several notable academic outcomes with manuscripts accepted at international and national conferences.",
+    image: `${SITE_ORIGIN}/img/blog/YEP.jpg`,
+  },
+   "post-03": {
+    title: "test",
+    description:
+      "test",
     image: `${SITE_ORIGIN}/img/blog/YEP.jpg`,
   },
 };
