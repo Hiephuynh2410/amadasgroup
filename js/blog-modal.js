@@ -47,8 +47,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 3) render ticker
   renderHeroNewsTicker(HERO_NEWS_IDS);
 
-  // 4) nếu bạn muốn mở theo hash trên cùng page: /index.html#post-01
-  autoOpenFromHash();
+  // 4) auto open theo URL (?post=... hoặc #post-...)
+  autoOpenFromUrl();
 
   // 5) observe changes
   observeTemplateChanges();
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("[BLOG] templates updated:", templates.map(t=>t.id));
         if (grid) renderCards();
         renderHeroNewsTicker(HERO_NEWS_IDS);
-        autoOpenFromHash();
+        autoOpenFromUrl();
       }
     });
     mo.observe(container, { childList: true, subtree: true });
@@ -144,6 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
       `;
 
+      // mở modal khi click card
       card.addEventListener("click", () => openById(postId, { fromCard: card }));
       card.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -176,36 +177,49 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // animate nếu mở từ card
     if (opts.fromCard) {
-      // ✅ publication layout: thumbimg class mới
       const img = opts.fromCard.querySelector(".blog-card__thumbimg");
       if (img) {
         lastThumbRect = img.getBoundingClientRect();
         lastThumbSrc = img.currentSrc || img.src;
-        return openFromTemplate(tpl, { animate: true, thumbRect: lastThumbRect, thumbSrc: lastThumbSrc });
+        return openFromTemplate(tpl, { animate: true, thumbRect: lastThumbRect, thumbSrc: lastThumbSrc, postId });
       }
     }
 
     // ticker mở ngay
-    return openFromTemplate(tpl, { animate: false });
+    return openFromTemplate(tpl, { animate: false, postId });
   }
 
-  function autoOpenFromHash() {
-    const raw = (location.hash || "").replace("#", "").trim();
-    if (!raw) return;
+  // ======================
+  // AUTO OPEN FROM URL
+  // - hỗ trợ ?post=post-01 hoặc #post-01
+  // ======================
+  function getPostIdFromUrl() {
+    const sp = new URLSearchParams(location.search);
+    const q = (sp.get("post") || "").trim();
+    if (q) return decodeURIComponent(q);
 
-    const postId = decodeURIComponent(raw);
-    if (document.body.dataset.openedHash === postId) return;
+    const h = (location.hash || "").replace("#", "").trim();
+    if (h) return decodeURIComponent(h);
+
+    return "";
+  }
+
+  function autoOpenFromUrl() {
+    const postId = getPostIdFromUrl();
+    if (!postId) return;
+
+    if (document.body.dataset.openedUrl === postId) return;
 
     const tpl = document.getElementById(postId);
     if (!tpl) return;
 
     if (!modal) {
-      console.warn("[HASH] modal not found, cannot auto open:", postId);
+      console.warn("[URL] modal not found, cannot auto open:", postId);
       return;
     }
 
-    console.log("[HASH] auto open:", postId);
-    document.body.dataset.openedHash = postId;
+    console.log("[URL] auto open:", postId);
+    document.body.dataset.openedUrl = postId;
     openById(postId);
   }
 
@@ -216,7 +230,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (isAnimating) return;
     if (modal.classList.contains("is-open")) return;
 
-    const { animate = false, thumbRect = null, thumbSrc = "" } = opts;
+    const { animate = false, thumbRect = null, thumbSrc = "", postId = tpl.id } = opts;
 
     const title = tpl.dataset.title || "Untitled";
     const meta = tpl.dataset.meta || "";
@@ -233,6 +247,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     bodyEl.innerHTML = "";
     bodyEl.appendChild(tpl.content.cloneNode(true));
+
+    // lưu postId hiện tại để share
+    modal.dataset.activePostId = postId;
 
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
@@ -332,7 +349,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       heroWrap.addEventListener("click", (e) => {
         const item = e.target.closest(".hero-news__item");
         if (!item) return;
-        openById(item.dataset.postId); // ✅ mở ngay bài đó
+        openById(item.dataset.postId);
       });
 
       heroWrap.addEventListener("keydown", (e) => {
@@ -340,7 +357,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const item = e.target.closest(".hero-news__item");
         if (!item) return;
         e.preventDefault();
-        openById(item.dataset.postId); // ✅ mở ngay bài đó
+        openById(item.dataset.postId);
       });
     }
   }
@@ -443,6 +460,47 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && modal && modal.classList.contains("is-open")) requestClose();
+  });
+
+  // ======================
+  // SHARE FACEBOOK (ĐÚNG POPUP “TẠO BÀI VIẾT”)
+  // - BẮT CLICK CHO MỌI NÚT .share-facebook (kể cả trong modal clone từ template)
+  // ======================
+  function buildShareUrl(postId) {
+    // ✅ dùng query param để Facebook preview tốt hơn hash
+    const url = new URL(window.location.href);
+    url.searchParams.set("post", postId);
+    url.hash = ""; // bỏ hash
+    return url.toString();
+  }
+
+  function openFacebookComposer(shareUrl) {
+    const fb = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(shareUrl);
+    // Mở popup đúng kiểu Facebook share
+    window.open(fb, "fbshare", "width=980,height=720,noopener,noreferrer");
+  }
+
+  // event delegation: bắt click mọi nơi
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".share-facebook");
+    if (!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // lấy postId từ data-postid nếu có, fallback từ modal đang mở
+    const postId =
+      (btn.dataset && btn.dataset.postid) ||
+      (modal && modal.dataset && modal.dataset.activePostId) ||
+      "";
+
+    if (!postId) {
+      console.warn("[SHARE] missing postId");
+      return;
+    }
+
+    const shareUrl = buildShareUrl(postId);
+    openFacebookComposer(shareUrl);
   });
 
   // ======================
