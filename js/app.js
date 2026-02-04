@@ -4,14 +4,11 @@
 
   const __AMADAS_URL__ = new URL(window.location.href);
 
-  // Detect mobile / touch device (an toàn hơn userAgent)
   const __AMADAS_IS_MOBILE__ =
     (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) ||
     (window.matchMedia && window.matchMedia("(max-width: 768px)").matches);
 
-  //  Chỉ khóa trên desktop, mobile thì không khóa
   const __AMADAS_LOCK__ = !__AMADAS_IS_MOBILE__ && (__AMADAS_URL__.searchParams.get("unlock") !== "1");
-  // State
   let __AMADAS_DEVTOOLS_OPEN__ = false;
   let __AMADAS_OVERLAY_VISIBLE__ = false;
 
