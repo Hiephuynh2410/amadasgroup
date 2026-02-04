@@ -569,6 +569,7 @@ body.blog-modal-lock{ overflow: hidden; }
   }
 
   .share-facebook{
+    margin: 0 2rem;
     padding:8px 12px;
     border:1px solid #e5e5e5;
     border-radius:10px;
