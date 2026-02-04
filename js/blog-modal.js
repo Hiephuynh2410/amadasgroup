@@ -21,6 +21,10 @@
         draining: false,
         bound: false,
         yearInfo: null,
+
+        // ✅ NEW: guards to stop infinite re-hydrate loops
+        hydrating: false,
+        tplSig: "",
       });
 
     state.cfg = {
@@ -35,7 +39,7 @@
     if (!state.bound) {
       bindEvents(state);
       bindLifecycle(state);
-      startObserver(state);
+      startObserver(state); // ✅ now safe (not body-wide)
       state.bound = true;
     }
 
@@ -43,18 +47,26 @@
     hydrate(state);
   };
 
+  // ✅ FIX 1: lock hydrate (no re-entrant)
   function hydrate(state) {
-    state.templates = getTemplates();
-    state.yearInfo = detectYearInfoFromTemplates(state.templates);
+    if (state.hydrating) return;
+    state.hydrating = true;
 
-    const grid = document.getElementById("blogGrid");
-    if (grid) renderCards(state, grid, state.templates);
+    try {
+      state.templates = getTemplates();
+      state.yearInfo = detectYearInfoFromTemplates(state.templates);
 
-    renderHeroNewsTicker(state);
-    renderHeroInlineNews(state);
-    autoOpenFromUrl(state);
+      const grid = document.getElementById("blogGrid");
+      if (grid) renderCards(state, grid, state.templates);
 
-    drainPendingOpen(state);
+      renderHeroNewsTicker(state);
+      renderHeroInlineNews(state);
+      autoOpenFromUrl(state);
+
+      drainPendingOpen(state);
+    } finally {
+      state.hydrating = false;
+    }
   }
 
   function scheduleHydrate(state) {
@@ -154,9 +166,31 @@
     );
   }
 
+  // ✅ FIX 3: DO NOT observe document.body (causes endless loop)
   function startObserver(state) {
-    const mo = new MutationObserver(() => scheduleHydrate(state));
-    mo.observe(document.body, { childList: true, subtree: true });
+    // chỉ observe nơi chứa templates/blog block (tùy bạn đang include ở đâu)
+    const mount =
+      document.getElementById("templateblog-container") ||
+      document.getElementById("templateblog") ||
+      document.getElementById("blogGrid") ||
+      document.getElementById("heroNews") ||
+      null;
+
+    // Nếu trang này không có blog/templates => không observe
+    if (!mount) return;
+
+    const mo = new MutationObserver(() => {
+      const tpls = document.querySelectorAll("template.blog-post");
+      const sig = Array.from(tpls).map((t) => t.id).join("|");
+
+      // chỉ hydrate khi danh sách template đổi
+      if (sig !== state.tplSig) {
+        state.tplSig = sig;
+        scheduleHydrate(state);
+      }
+    });
+
+    mo.observe(mount, { childList: true, subtree: true });
     state.mo = mo;
   }
 
@@ -379,6 +413,7 @@
     queueOpen(state, postId, { fromCard: false });
   }
 
+  // ✅ FIX 2: signature cho hero ticker (không đổi thì không innerHTML lại)
   function renderHeroNewsTicker(state) {
     const heroWrap = document.getElementById("heroNews");
     const heroMarquee = document.getElementById("heroNewsMarquee");
@@ -394,6 +429,11 @@
     }
 
     if (!state.templates || !state.templates.length) {
+      const sigLoading = "__loading__";
+      if (heroMarquee.dataset.sig === sigLoading && heroList.dataset.sig === sigLoading) return;
+      heroMarquee.dataset.sig = sigLoading;
+      heroList.dataset.sig = sigLoading;
+
       heroMarquee.innerHTML = `<div class="hero-news__row"><span class="hero-news__item">Loading announcements…</span></div>`;
       heroList.innerHTML = "";
       return;
@@ -405,12 +445,25 @@
       .filter((tpl) => tpl && tpl.tagName === "TEMPLATE");
 
     if (!found.length) {
+      const sigEmpty = "__empty__";
+      if (heroMarquee.dataset.sig === sigEmpty && heroList.dataset.sig === sigEmpty) return;
+      heroMarquee.dataset.sig = sigEmpty;
+      heroList.dataset.sig = sigEmpty;
+
       heroMarquee.innerHTML = `<div class="hero-news__row"><span class="hero-news__item">No announcements.</span></div>`;
       heroList.innerHTML = "";
       return;
     }
 
     const onBlog = isOnBlogPage(state);
+
+    const sig = found
+      .map((tpl) => `${tpl.id}|${tpl.dataset.title || ""}|${tpl.dataset.meta || ""}`)
+      .join("||");
+
+    if (heroMarquee.dataset.sig === sig && heroList.dataset.sig === sig) return;
+    heroMarquee.dataset.sig = sig;
+    heroList.dataset.sig = sig;
 
     const itemsHtml = found
       .map((tpl, idx) => {
@@ -446,6 +499,7 @@
       .join("");
   }
 
+  // ✅ FIX 2: signature cho inline news (không đổi thì không innerHTML lại)
   function renderHeroInlineNews(state) {
     const wrap = document.getElementById("heroNewsInline");
     const list = document.getElementById("heroNewsInlineList");
@@ -453,6 +507,11 @@
 
     if (!state.templates || !state.templates.length) {
       wrap.hidden = false;
+
+      const sigLoading = "__loading__";
+      if (list.dataset.sig === sigLoading) return;
+      list.dataset.sig = sigLoading;
+
       list.innerHTML = `<div class="hero-news-inline__loading">Loading news…</div>`;
       return;
     }
@@ -466,6 +525,10 @@
         return { id: tpl.id, title, meta, year, date };
       })
       .filter((p) => Number.isFinite(p.year));
+
+    const inlineSig = postsAll.map((p) => `${p.id}|${p.title}|${p.meta}`).join("||");
+    if (list.dataset.sig === inlineSig) return;
+    list.dataset.sig = inlineSig;
 
     if (!postsAll.length) {
       wrap.hidden = true;

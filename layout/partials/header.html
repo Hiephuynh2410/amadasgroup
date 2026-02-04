@@ -1,3 +1,4 @@
+
 <header class="site-header">
   <div class="container nav-wrap">
     <a class="brand" href="#home">
@@ -13,66 +14,73 @@
     </a>
 
     <nav id="siteNav" class="nav">
-      <a href="index.html" class="nav-link">AMADAS</a>
-      <a href="layout/partials/contact.html" class="nav-link">OUR TEAM</a>
-      <a href="layout/partials/scientificAdvisor.html" class="nav-link">ADVISORS</a>
-      <a href="layout/publications/publication.html" class="nav-link">PUBLICATIONS</a>
-      <a href="layout/blog/blog.html" class="nav-link">BLOG</a>
-      <a href="layout/partials/contactus.html" class="nav-link">CONTACT</a>
-      
+      <a href="index.html" class="nav-link" data-trans>AMADAS</a>
+      <a href="layout/partials/contact.html" class="nav-link" data-trans>OUR TEAM</a>
+      <a href="layout/partials/scientificAdvisor.html" class="nav-link" data-trans>ADVISORS</a>
+      <a href="layout/publications/publication.html" class="nav-link" data-trans>PUBLICATIONS</a>
+      <a href="layout/blog/blog.html" class="nav-link" data-trans>BLOG</a>
+      <a href="layout/partials/contactus.html" class="nav-link" data-trans>CONTACT</a>
     </nav>
 
     <div class="nav-actions">
-      <div id="themePicker" class="theme-picker">
-        <!-- <button id="themeMenuBtn" class="theme-menu-btn" type="button"
-                aria-haspopup="menu" aria-expanded="false" aria-label="Theme settings">
-          <span id="themeMenuLabel" class="theme-menu-label">THEME</span>
-          <svg class="theme-menu-caret" viewBox="0 0 24 24" aria-hidden="true">
+      <div id="langPicker" class="lang-picker">
+        <button
+          id="langMenuBtn"
+          class="lang-menu-btn"
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-label="Language"
+        >
+          <span id="langBtnLabel">EN</span>
+          <svg class="lang-menu-caret" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round"></path>
+              stroke-linecap="round" stroke-linejoin="round"></path>
           </svg>
-        </button> -->
-
-         <button id="themeMenuBtn" class="theme-menu-btn theme-menu-btn--icon" type="button"
-                  aria-haspopup="menu" aria-expanded="false" aria-label="Theme settings">
-            <span class="theme-icon" aria-hidden="true">
-              <!-- Sun icon -->
-              <svg class="theme-ico theme-ico--sun" viewBox="0 0 24 24">
-                <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" fill="none" stroke="currentColor" stroke-width="2"/>
-                <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M5 19l1.5-1.5"
-                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-
-              <!-- Moon icon -->
-              <svg class="theme-ico theme-ico--moon" viewBox="0 0 24 24">
-                <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z"
-                      fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-              </svg>
-            </span>
-
-            <svg class="theme-menu-caret" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
         </button>
- 
-        <div id="themeMenu" class="theme-menu" role="menu" aria-label="Theme mode">
-          <button class="theme-menu-item" role="menuitemradio" data-mode="system" aria-checked="false">
-            <span>System</span>
+
+        <div id="langMenu" class="lang-menu" role="menu" aria-label="Language">
+          <button class="lang-menu-item" role="menuitemradio" data-lang="en" aria-checked="true">
+            <span>English</span>
+            <small>EN</small>
           </button>
-          <button class="theme-menu-item" role="menuitemradio" data-mode="auto" aria-checked="false">
-            <span>Auto</span>
-          </button>
-          <button class="theme-menu-item" role="menuitemradio" data-mode="dark" aria-checked="false">
-            <span>Dark</span>
-          </button>
-          <button class="theme-menu-item" role="menuitemradio" data-mode="light" aria-checked="false">
-            <span>Light</span>
+          <button class="lang-menu-item" role="menuitemradio" data-lang="vi" aria-checked="false">
+            <span>Tiếng Việt</span>
+            <small>VI</small>
           </button>
         </div>
       </div>
 
-      <!-- Burger -->
+      <div id="themePicker" class="theme-picker">
+        <button id="themeMenuBtn" class="theme-menu-btn theme-menu-btn--icon" type="button"
+                aria-haspopup="menu" aria-expanded="false" aria-label="Theme settings">
+          <span class="theme-icon" aria-hidden="true">
+            <svg class="theme-ico theme-ico--sun" viewBox="0 0 24 24">
+              <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M5 19l1.5-1.5"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+
+            <svg class="theme-ico theme-ico--moon" viewBox="0 0 24 24">
+              <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5Z"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </span>
+
+          <svg class="theme-menu-caret" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+
+        <div id="themeMenu" class="theme-menu" role="menu" aria-label="Theme mode">
+          <button class="theme-menu-item" role="menuitemradio" data-mode="system" aria-checked="false"><span>System</span></button>
+          <button class="theme-menu-item" role="menuitemradio" data-mode="auto" aria-checked="false"><span>Auto</span></button>
+          <button class="theme-menu-item" role="menuitemradio" data-mode="dark" aria-checked="false"><span>Dark</span></button>
+          <button class="theme-menu-item" role="menuitemradio" data-mode="light" aria-checked="false"><span>Light</span></button>
+        </div>
+      </div>
+
       <button id="navToggle" class="nav-toggle" type="button"
               aria-controls="siteNav"
               aria-expanded="false"

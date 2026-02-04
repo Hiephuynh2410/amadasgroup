@@ -1,0 +1,177 @@
+
+.lang-picker{
+  position: relative;
+}
+
+.site-header,
+.nav-wrap,
+.nav-actions,
+.theme-picker,
+.lang-picker{
+  overflow: visible !important;
+}
+
+.lang-menu-btn{
+  height: 42px;
+  padding: 0 12px;
+  min-width: 54px;
+  border-radius: 14px;
+  border: 1px solid var(--btn-border);
+  background: var(--btn-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 26px rgba(0,0,0,.18);
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.lang-menu-btn:hover{
+  background: var(--btn-bg-hover);
+  border-color: var(--btn-border-hover);
+  transform: translateY(-1px);
+}
+.lang-menu-btn:active{ transform: translateY(0); }
+
+.lang-menu-btn:focus-visible{
+  outline: 2px solid rgba(127,127,127,.45);
+  outline-offset: 3px;
+}
+
+.lang-menu-caret{
+  width: 14px;
+  height: 14px;
+  opacity: .85;
+  transition: transform .15s ease, opacity .15s ease;
+}
+
+.lang-picker.is-open .lang-menu-caret{
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+/* dropdown */
+.lang-menu{
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 220px;
+
+  background: var(--menu-bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.25);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(.98);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+  z-index: 999999; /* cao hơn google */
+}
+
+.lang-picker.is-open .lang-menu{
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.lang-menu-item{
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 10px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+
+  font-size: 13px;
+  letter-spacing: .2px;
+}
+
+.lang-menu-item:hover{
+  background: rgba(127,127,127,.12);
+}
+
+.lang-menu-item[aria-checked="true"]{
+  background: rgba(127,127,127,.18);
+  border: 1px solid rgba(127,127,127,.22);
+}
+
+.lang-menu-item small{
+  color: var(--muted);
+  font-weight: 800;
+}
+
+/* ====== 2) Google Translate: ẩn banner trắng + tooltip + bubble ======
+   Mục tiêu: không thấy "Translated to Vietnamese" bar nữa
+   Lưu ý: Google có thể đổi class/id theo thời gian.
+*/
+
+/* Ẩn banner iframe trên cùng */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate{
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+}
+
+/* Google hay bọc body/html bằng .skiptranslate và set top -> kéo lại */
+html,
+body{
+  top: 0 !important;
+}
+
+/* Đôi lúc có div skiptranslate đầu body gây khoảng trắng */
+body > .skiptranslate{
+  display: none !important;
+}
+
+/* Ẩn gadget nếu vô tình hiện ra */
+#google_translate_element,
+.goog-te-gadget,
+.goog-te-gadget-simple{
+  display: none !important;
+}
+
+#goog-gt-tt,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-text-highlight{
+  display: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.goog-te-balloon-frame{
+  display: none !important;
+}
+
+.skiptranslate,
+.skiptranslate *{
+  font: inherit !important;
+  line-height: inherit !important;
+  letter-spacing: inherit !important;
+}
+
+body{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.site-header{
+  position: sticky;
+  top: 0 !important;
+  z-index: 999998;
+}
