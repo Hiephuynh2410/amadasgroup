@@ -164,6 +164,7 @@
 }
 
 .hero-news-inline__groupYear{
+  display: none;
   margin: 0 0 10px 0;
   font-size: 14.5px;
   font-weight: 900;
@@ -226,7 +227,7 @@
 }
 
 .hero-news-inline__month {
-  margin-right: 0.5rem;
+  margin-right: 3rem;
 }
 
 /* Focus keyboard */

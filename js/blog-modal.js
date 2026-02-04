@@ -526,8 +526,6 @@
         `;
       };
 
-
-
       if (!state.templates || !state.templates.length) {
         wrap.hidden = false;
 
@@ -831,15 +829,20 @@
     if (!parts.length) return String(meta || "");
     const d = parseDateLoose(parts[0]);
     if (!d) return String(meta || "");
-    parts[0] = d.toLocaleString("en-US", { month: "long" });
+    parts[0] = d.toLocaleString("en-US", { month: "short", year: "long" }); // "Feb 2026"
     return parts.join(" • ");
   }
+
 
   function metaFirstToMonth(dateStr = "") {
     const d = parseDateLoose(String(dateStr).trim());
     if (!d) return String(dateStr || "");
-    return d.toLocaleString("en-US", { month: "long" });
+
+    const mon = d.toLocaleString("en-US", { month: "short" }); // "Feb"
+    const yr = d.getFullYear();                               // 2026
+    return `${mon} ${yr}`;                                    // "Feb 2026"
   }
+
 
   function parseDateLoose(s) {
     const raw = String(s || "").trim();
