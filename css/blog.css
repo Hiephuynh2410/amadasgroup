@@ -328,7 +328,7 @@
 .blog-modal__body .post h2{ margin: 20px 0 10px; line-height: 1.25; }
 
 .blog-modal__body .post p{
-  margin: 0 0 14px;
+  margin: 20px 0 14px;
   text-align: justify;
   text-justify: inter-word;
 }
