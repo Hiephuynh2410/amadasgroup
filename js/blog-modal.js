@@ -1,14 +1,10 @@
 document.addEventListener("DOMContentLoaded", async () => {
   await waitForIncludes();
 
-
-  const grid  = document.getElementById("blogGrid");
-  const modal = document.getElementById("blogModal");
+  // ===== DOM =====
+  const grid  = document.getElementById("blogGrid");     // chỉ có ở trang blog grid
+  const modal = document.getElementById("blogModal");    // popup modal
   const panel = document.getElementById("modalPanel");
-
-  const heroWrap    = document.getElementById("heroNews");
-  const heroMarquee = document.getElementById("heroNewsMarquee");
-  const heroList    = document.getElementById("heroNewsList");
 
   const coverEl   = document.getElementById("modalCover");
   const titleEl   = document.getElementById("modalTitle");
@@ -16,23 +12,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   const excerptEl = document.getElementById("modalExcerpt");
   const bodyEl    = document.getElementById("modalBody");
 
+  // hero ticker
+  const heroWrap    = document.getElementById("heroNews");
+  const heroMarquee = document.getElementById("heroNewsMarquee");
+  const heroList    = document.getElementById("heroNewsList");
+
+  // state
   let templates = [];
   let lastActive = null;
   let lastThumbRect = null;
   let lastThumbSrc = "";
   let isAnimating = false;
 
-  //  Sau này muốn thêm bài chỉ sửa mảng này
   const HERO_NEWS_IDS = ["post-01", "post-02"];
 
-  console.group("[BLOG] init (after includes)");
+  console.group("[BLOG] init");
   console.log("path:", location.pathname);
   console.log("grid:", !!grid, "modal:", !!modal, "panel:", !!panel);
-  console.log("heroNews:", !!heroWrap, "marquee:", !!heroMarquee, "list:", !!heroList);
+  console.log("heroWrap:", !!heroWrap, "heroMarquee:", !!heroMarquee, "heroList:", !!heroList);
   console.log("HERO_NEWS_IDS:", HERO_NEWS_IDS);
   console.groupEnd();
 
-
+  // 1) đợi templates (quan trọng: Home phải include templateblog.html)
   templates = await waitForTemplates(12000);
 
   console.group("[BLOG] templates");
@@ -40,17 +41,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("ids:", templates.map(t => t.id));
   console.groupEnd();
 
+  // 2) render blog cards nếu có grid
   if (grid && templates.length) renderCards();
 
+  // 3) render ticker
   renderHeroNewsTicker(HERO_NEWS_IDS);
 
+  // 4) nếu bạn muốn mở theo hash trên cùng page: /index.html#post-01
+  autoOpenFromHash();
+
+  // 5) observe changes
   observeTemplateChanges();
 
+  // ======================
+  // INCLUDE WAIT
+  // ======================
   async function waitForIncludes(timeoutMs = 8000) {
     const start = performance.now();
 
     if (typeof includePartials === "function") {
-      console.log("[INCLUDE] includePartials() detected => running...");
       try { await includePartials(); }
       catch (e) { console.warn("[INCLUDE] includePartials error:", e); }
     } else {
@@ -58,21 +67,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     while (performance.now() - start < timeoutMs) {
-      const heroOk = !!document.getElementById("heroNews"); // hero đã vào DOM
-      const tplOk  = document.querySelectorAll("template.blog-post").length > 0
-                  || !!document.getElementById("templateblog-container"); // container có tồn tại
-
-      if (heroOk || tplOk) {
-        console.log("[INCLUDE] DOM seems ready (heroOk:", heroOk, "tplOrContainerOk:", tplOk, ")");
-        return true;
-      }
+      const tplCount = document.querySelectorAll("template.blog-post").length;
+      const heroOk = !!document.getElementById("heroNews");
+      if (heroOk || tplCount > 0) return true;
       await sleep(80);
     }
-
-    console.warn("[INCLUDE] timeout waiting included DOM. Still proceed.");
+    console.warn("[INCLUDE] timeout. continue anyway.");
     return false;
   }
 
+  // ======================
+  // TEMPLATES
+  // ======================
   function getTemplates() {
     return Array.from(document.querySelectorAll("template.blog-post"));
   }
@@ -82,9 +88,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     while (performance.now() - start < timeoutMs) {
       const tpls = getTemplates();
       if (tpls.length) return tpls;
-      await sleep(100);
+      await sleep(120);
     }
-    console.warn("[BLOG] timeout: templates not found. Home page must include templateblog.html");
+    console.warn("[BLOG] templates NOT found. Home must include templateblog.html (even hidden).");
     return [];
   }
 
@@ -94,21 +100,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       const tpls = getTemplates();
       if (tpls.length && tpls.length !== templates.length) {
         templates = tpls;
-
-        console.group("[BLOG] templates updated");
-        console.log("count:", templates.length);
-        console.log("ids:", templates.map(t => t.id));
-        console.groupEnd();
-
+        console.log("[BLOG] templates updated:", templates.map(t=>t.id));
         if (grid) renderCards();
         renderHeroNewsTicker(HERO_NEWS_IDS);
+        autoOpenFromHash();
       }
     });
     mo.observe(container, { childList: true, subtree: true });
   }
 
+  // ======================
+  // BLOG GRID  (PUBLICATION STYLE)
+  // ======================
   function renderCards() {
-    if (!grid) return;
     grid.innerHTML = "";
 
     templates.forEach((tpl) => {
@@ -119,27 +123,32 @@ document.addEventListener("DOMContentLoaded", async () => {
       const postId = tpl.id;
 
       const card = document.createElement("article");
-      card.className = "blog-card";
+      card.className = "blog-card blog-card--pub";
       card.tabIndex = 0;
       card.dataset.postId = postId;
 
+      // ✅ publication-like row: thumb-left + content-right
       card.innerHTML = `
-        <div class="blog-card__thumb">
-          <img src="${cover}" alt="${escHtml(title)}" loading="lazy" />
+        <div class="blog-card__left">
+          <img class="blog-card__thumbimg"
+               src="${escAttr(cover)}"
+               alt="${escAttr(title)}"
+               loading="lazy" />
         </div>
-        <div class="blog-card__body">
-          <h3 class="blog-card__title" data-full="${escAttr(title)}">${escHtml(title)}</h3>
-          <p class="blog-card__meta" data-full="${escAttr(meta)}">${escHtml(meta)}</p>
+
+        <div class="blog-card__right">
+          <h3 class="blog-card__title" title="${escAttr(title)}">${escHtml(title)}</h3>
+          <p class="blog-card__meta" title="${escAttr(meta)}">${escHtml(meta)}</p>
           <p class="blog-card__excerpt">${escHtml(excerpt)}</p>
           <span class="blog-card__cta">Read more →</span>
         </div>
       `;
 
-      card.addEventListener("click", () => openFromCard(card));
+      card.addEventListener("click", () => openById(postId, { fromCard: card }));
       card.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          openFromCard(card);
+          openById(postId, { fromCard: card });
         }
       });
 
@@ -147,34 +156,65 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  async function openFromCard(card) {
-    if (isAnimating) return;
-    if (!modal || !panel) return;
-    if (modal.classList.contains("is-open")) return;
-
-    const postId = card.dataset.postId;
+  // ======================
+  // OPEN BY ID (card + ticker)
+  // ======================
+  async function openById(postId, opts = {}) {
     const tpl = document.getElementById(postId);
-    if (!tpl) return;
+    if (!tpl || tpl.tagName !== "TEMPLATE") {
+      console.warn("[OPEN] template not found:", postId);
+      return;
+    }
+
+    // ✅ bạn làm popup, nên bắt buộc phải có modal DOM
+    if (!modal || !panel || !titleEl || !metaEl || !excerptEl || !bodyEl || !coverEl) {
+      console.warn("[OPEN] modal not found on this page => please include blogModal HTML on Home too.");
+      return;
+    }
 
     lastActive = document.activeElement;
 
-    const thumbImg = card.querySelector(".blog-card__thumb img");
-    if (!thumbImg) return;
+    // animate nếu mở từ card
+    if (opts.fromCard) {
+      // ✅ publication layout: thumbimg class mới
+      const img = opts.fromCard.querySelector(".blog-card__thumbimg");
+      if (img) {
+        lastThumbRect = img.getBoundingClientRect();
+        lastThumbSrc = img.currentSrc || img.src;
+        return openFromTemplate(tpl, { animate: true, thumbRect: lastThumbRect, thumbSrc: lastThumbSrc });
+      }
+    }
 
-    lastThumbRect = thumbImg.getBoundingClientRect();
-    lastThumbSrc = thumbImg.currentSrc || thumbImg.src;
-
-    openFromTemplate(tpl, { animate: true, thumbRect: lastThumbRect, thumbSrc: lastThumbSrc });
+    // ticker mở ngay
+    return openFromTemplate(tpl, { animate: false });
   }
 
-  // =========================
-  // OPEN MODAL FROM TEMPLATE
-  // =========================
-  async function openFromTemplate(tpl, opts = {}) {
-    if (!modal || !panel || !titleEl || !metaEl || !excerptEl || !bodyEl || !coverEl) {
-      console.warn("[BLOG] modal elements missing on this page");
+  function autoOpenFromHash() {
+    const raw = (location.hash || "").replace("#", "").trim();
+    if (!raw) return;
+
+    const postId = decodeURIComponent(raw);
+    if (document.body.dataset.openedHash === postId) return;
+
+    const tpl = document.getElementById(postId);
+    if (!tpl) return;
+
+    if (!modal) {
+      console.warn("[HASH] modal not found, cannot auto open:", postId);
       return;
     }
+
+    console.log("[HASH] auto open:", postId);
+    document.body.dataset.openedHash = postId;
+    openById(postId);
+  }
+
+  // ======================
+  // OPEN MODAL FROM TEMPLATE
+  // ======================
+  async function openFromTemplate(tpl, opts = {}) {
+    if (isAnimating) return;
+    if (modal.classList.contains("is-open")) return;
 
     const { animate = false, thumbRect = null, thumbSrc = "" } = opts;
 
@@ -225,17 +265,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (closeBtn) closeBtn.focus();
   }
 
-  // =========================
-  // HERO NEWS TICKER + LOG
-  // =========================
+  // ======================
+  // HERO TICKER
+  // ======================
   function renderHeroNewsTicker(ids) {
-    // ✅ re-query hero DOM in case it was injected later
-    const wrap = document.getElementById("heroNews");
-    const marquee = document.getElementById("heroNewsMarquee");
-    const list = document.getElementById("heroNewsList");
-
-    if (!wrap || !marquee || !list) {
-      console.warn("[HERO-NEWS] hero elements not found (wrap/marquee/list). Is hero.html included?");
+    if (!heroWrap || !heroMarquee || !heroList) {
+      console.warn("[HERO] hero elements missing on this page.");
       return;
     }
 
@@ -248,20 +283,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       else missing.push(id);
     });
 
-    console.group("[HERO-NEWS] resolve");
+    console.group("[HERO] resolve");
     console.log("found:", found.map(t => t.id));
     console.log("missing:", missing);
     console.groupEnd();
 
+    heroWrap.hidden = false;
+
     if (!found.length) {
-      wrap.hidden = false;
-      marquee.innerHTML =
-        `<div class="hero-news__row"><span class="hero-news__item">No announcements. Check templateblog include + IDs.</span></div>`;
-      list.innerHTML = "";
+      heroMarquee.innerHTML = `<div class="hero-news__row">
+        <span class="hero-news__item">No announcements. Home must include templateblog.html</span>
+      </div>`;
+      heroList.innerHTML = "";
       return;
     }
-
-    wrap.hidden = false;
 
     const itemsHtml = found.map((tpl, idx) => {
       const title = tpl.dataset.title || "Untitled";
@@ -269,63 +304,50 @@ document.addEventListener("DOMContentLoaded", async () => {
       const dot = idx === 0 ? "" : `<span class="hero-news__dot" aria-hidden="true"></span>`;
       return `
         ${dot}
-        <span class="hero-news__item" role="link" tabindex="0" data-post-id="${tpl.id}">
+        <span class="hero-news__item" role="link" tabindex="0" data-post-id="${escAttr(tpl.id)}">
           <strong>${escHtml(title)}</strong>
           <span class="hero-news__meta">${meta ? "• " + escHtml(meta) : ""}</span>
         </span>
       `;
     }).join("");
 
-    marquee.innerHTML =
+    heroMarquee.innerHTML =
       `<div class="hero-news__row">${itemsHtml}</div>` +
       `<div class="hero-news__row">${itemsHtml}</div>`;
 
-    list.innerHTML = found.map((tpl) => {
+    heroList.innerHTML = found.map((tpl) => {
       const title = tpl.dataset.title || "Untitled";
       const meta = tpl.dataset.meta || "";
       return `
-        <span class="hero-news__item" role="link" tabindex="0" data-post-id="${tpl.id}">
+        <span class="hero-news__item" role="link" tabindex="0" data-post-id="${escAttr(tpl.id)}">
           <strong>${escHtml(title)}</strong>
           <span class="hero-news__meta">${meta ? "• " + escHtml(meta) : ""}</span>
         </span>
       `;
     }).join("");
 
-    // bind 1 lần
-    if (!wrap.dataset.bound) {
-      wrap.dataset.bound = "1";
+    if (!heroWrap.dataset.bound) {
+      heroWrap.dataset.bound = "1";
 
-      wrap.addEventListener("click", (e) => {
+      heroWrap.addEventListener("click", (e) => {
         const item = e.target.closest(".hero-news__item");
         if (!item) return;
-
-        const tpl = document.getElementById(item.dataset.postId);
-        if (!tpl) return;
-
-        lastActive = document.activeElement;
-        openFromTemplate(tpl, { animate: false });
+        openById(item.dataset.postId); // ✅ mở ngay bài đó
       });
 
-      wrap.addEventListener("keydown", (e) => {
+      heroWrap.addEventListener("keydown", (e) => {
         if (e.key !== "Enter" && e.key !== " ") return;
-
         const item = e.target.closest(".hero-news__item");
         if (!item) return;
-
         e.preventDefault();
-
-        const tpl = document.getElementById(item.dataset.postId);
-        if (!tpl) return;
-
-        lastActive = document.activeElement;
-        openFromTemplate(tpl, { animate: false });
+        openById(item.dataset.postId); // ✅ mở ngay bài đó
       });
     }
   }
 
-  // =========================
+  // ======================
   // CLOSE MODAL
-  // =========================
+  // ======================
   function requestClose() {
     if (isAnimating) return;
     if (!modal || !modal.classList.contains("is-open")) return;
@@ -333,7 +355,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function closeModal() {
-    if (!modal || !panel || !coverEl || !bodyEl) return;
     if (!lastThumbRect) return finalizeClose();
 
     isAnimating = true;
@@ -355,7 +376,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function finalizeClose() {
-    if (!modal || !panel || !bodyEl) return;
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("blog-modal-lock");
@@ -365,7 +385,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function hardResetPanelHidden() {
-    if (!panel) return;
     panel.style.transition = "none";
     panel.style.transform = "translate(-50%, -50%)";
     panel.style.borderRadius = "18px";
@@ -426,8 +445,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (e.key === "Escape" && modal && modal.classList.contains("is-open")) requestClose();
   });
 
+  // ======================
+  // ESCAPE HELPERS
+  // ======================
   function escHtml(s) {
-    return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    return String(s)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
   }
 
   function escAttr(s) {

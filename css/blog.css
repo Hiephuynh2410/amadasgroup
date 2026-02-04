@@ -6,15 +6,13 @@
 .blog-title { font-size: 34px; line-height: 1.15; margin: 0 0 6px 0; }
 .blog-subtitle { margin: 0; opacity: 0.8; }
 
+/* ✅ Publication layout: 1 cột, mỗi item là 1 hàng */
 .blog-grid{
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 18px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   margin-top: 18px;
 }
-@media (max-width: 1024px){ .blog-grid{ grid-template-columns: repeat(8, 1fr); } }
-@media (max-width: 680px){ .blog-grid{ grid-template-columns: repeat(4, 1fr); } }
-
 
 /* =========================
    THEME TOKENS
@@ -26,7 +24,7 @@
   --blog-card-border: rgba(255,255,255,0.10);
   --blog-card-border-hover: rgba(255,255,255,0.18);
 
-  /* tooltip */
+  /* tooltip (giữ token nhưng publication không cần tooltip pseudo) */
   --blog-tip-bg: rgba(0,0,0,0.88);
   --blog-tip-text: #fff;
   --blog-tip-border: rgba(255,255,255,0.18);
@@ -98,14 +96,18 @@
 
 
 /* =========================
-   BLOG CARD
+   BLOG CARD  (PUBLICATION)
    ========================= */
+/* ✅ Card dạng publication: ảnh nhỏ trái + text phải */
 .blog-card{
-  grid-column: span 4;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 14px;
+  align-items: center;
+
+  padding: 14px;
   border-radius: 16px;
-  overflow: visible;
+  overflow: hidden;
   cursor: pointer;
 
   background: var(--blog-card-bg);
@@ -114,8 +116,6 @@
   transition: transform .18s ease, border-color .18s ease, background .18s ease;
   transform: translateZ(0);
 }
-@media (max-width: 1024px){ .blog-card{ grid-column: span 4; } }
-@media (max-width: 680px){ .blog-card{ grid-column: span 4; } }
 
 .blog-card:hover{
   transform: translateY(-2px);
@@ -123,69 +123,84 @@
   background: var(--blog-card-bg-hover);
 }
 
-.blog-card__thumb{
-  position: relative;
-  aspect-ratio: 16 / 9;
+/* Left thumbnail box */
+.blog-card__left{
+  width: 96px;
+  height: 96px;
+  border-radius: 14px;
   overflow: hidden;
-  border-radius: 16px 16px 0 0;
+  border: 1px solid var(--blog-card-border);
 }
-.blog-card__thumb img{
+
+/* Thumbnail image */
+.blog-card__thumbimg{
   width: 100%;
   height: 100%;
   object-fit: cover;
   transform: scale(1.02);
   transition: transform .25s ease;
 }
-.blog-card:hover .blog-card__thumb img{ transform: scale(1.06); }
+.blog-card:hover .blog-card__thumbimg{ transform: scale(1.06); }
 
-.blog-card__body{ padding: 14px 14px 16px; }
-.blog-card__title{ margin: 0 0 6px 0; font-size: 18px; line-height: 1.25; }
-.blog-card__meta{ margin: 0 0 10px 0; font-size: 13px; opacity: 0.75; }
-.blog-card__excerpt{ margin: 0 0 12px 0; font-size: 14px; opacity: 0.9; }
-.blog-card__cta{ font-size: 14px; font-weight: 600; opacity: 0.9; }
+/* Right content */
+.blog-card__right{ min-width: 0; } /* quan trọng để ellipsis hoạt động */
 
-/* Ellipsis (1 line) */
-.blog-card__title, .blog-card__meta{
-  position: relative;
+/* Title + meta ellipsis 1 dòng */
+.blog-card__title,
+.blog-card__meta{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Tooltip */
-.blog-card__title:hover::after,
-.blog-card__meta:hover::after{
-  content: attr(data-full);
-  position: absolute;
-  left: 0;
-  top: calc(100% + 8px);
-  max-width: 560px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: var(--blog-tip-bg);
-  color: var(--blog-tip-text);
-  font-size: 12px;
-  line-height: 1.35;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  border: 1px solid var(--blog-tip-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-  z-index: 99999;
-  pointer-events: none;
+/* Title */
+.blog-card__title{
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 700;
 }
-.blog-card__title:hover::before,
-.blog-card__meta:hover::before{
-  content:"";
-  position:absolute;
-  left: 18px;
-  top: calc(100% + 3px);
-  width:10px;height:10px;
-  background: var(--blog-tip-bg);
-  transform: rotate(45deg);
-  border-left: 1px solid var(--blog-tip-border);
-  border-top: 1px solid var(--blog-tip-border);
-  z-index: 100000;
-  pointer-events:none;
+
+/* Meta */
+.blog-card__meta{
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  opacity: 0.78;
+}
+
+/* Excerpt 2 dòng */
+.blog-card__excerpt{
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  opacity: 0.9;
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* CTA */
+.blog-card__cta{
+  font-size: 14px;
+  font-weight: 650;
+  opacity: 0.9;
+}
+
+/* ✅ Responsive */
+@media (max-width: 720px){
+  .blog-card{
+    grid-template-columns: 76px 1fr;
+    padding: 12px;
+    gap: 12px;
+  }
+  .blog-card__left{
+    width: 76px;
+    height: 76px;
+    border-radius: 12px;
+  }
+  .blog-card__title{ font-size: 16px; }
+  .blog-card__excerpt{ -webkit-line-clamp: 2; }
 }
 
 
@@ -301,7 +316,7 @@
   width: 64px;
   height: 64px;
   object-fit: cover;
-  border-radius: 14px;     /* muốn tròn hẳn: 999px */
+  border-radius: 14px;
   border: 1px solid var(--line);
 }
 
@@ -332,9 +347,9 @@
 
 .blog-modal__title{
   margin: 0;
-  font-size: 16px;     /* nhỏ lại */
+  font-size: 16px;
   line-height: 1.2;
-  -webkit-line-clamp: 2; /* tối đa 2 dòng */
+  -webkit-line-clamp: 2;
 }
 
 .blog-modal__meta{
@@ -347,11 +362,12 @@
 }
 
 .blog-modal__excerpt{
+  display: none;
   margin: 0;
   font-size: 12.5px;
   line-height: 1.35;
   opacity: 0.85;
-  -webkit-line-clamp: 1; /* 1 dòng thôi cho gọn */
+  -webkit-line-clamp: 1;
 }
 
 
@@ -395,7 +411,7 @@
 }
 
 .blog-modal__body .post img{
-  max-width: 100%;
+  max-width: 80%;
   border-radius: 12px;
   display: block;
   margin: 12px auto;
@@ -426,7 +442,7 @@
 
 
 /* =========================
-   PRETTY LINKS (ONE SINGLE SOURCE OF TRUTH)
+   PRETTY LINKS
    ========================= */
 .blog-modal__body .post a{
   --link: var(--accent, #6ee7ff);
@@ -461,7 +477,7 @@
   border-bottom-color: transparent;
 }
 
-/* Source link block at end (recommended) */
+/* Source link block at end */
 .blog-modal__body .post .post-footer{
   margin-top: 16px;
   padding-top: 14px;
@@ -509,15 +525,37 @@
   }
 }
 
-
 body.blog-modal-lock{ overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce){
   .blog-modal__backdrop,
   .blog-modal__panel,
   .blog-card,
-  .blog-card__thumb img,
+  .blog-card__thumbimg,
   .blog-modal__body .post a{
     transition: none !important;
   }
+}
+
+/* Figure + caption inside post */
+.blog-modal__body .post .post-figure{
+  margin: 12px auto 16px;
+}
+
+.blog-modal__body .post .post-figure img{
+  width: 100%;
+  max-width: 100%;
+  border-radius: 12px;
+  display: block;
+  margin: 0 auto;
+  border: 1px solid var(--blog-post-line);
+}
+
+.blog-modal__body .post .post-caption{
+  margin-top: 8px;
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.85;
+  text-align: center;
+  color: var(--blog-post-muted);
 }
