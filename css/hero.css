@@ -180,7 +180,6 @@
   font-size: 18px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
 }
 
 /* ✅ Item: grid 3 cột (bullet | title | date) -> bullet không bị chạy ra ngoài */
