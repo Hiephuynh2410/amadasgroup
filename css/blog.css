@@ -407,8 +407,12 @@
   margin-bottom: 16px;
   color: var(--blog-post-muted);
   font-size: 13px;
+  display: flex;
+  justify-content: space-between;
 }
-
+.blog-modal__body .post-meta:hover {
+  cursor: pointer;
+}
 .blog-modal__body .post img{
   max-width: 80%;
   border-radius: 12px;
@@ -562,4 +566,9 @@ body.blog-modal-lock{ overflow: hidden; }
 .blog-card__spacer {
   display: flex;
   justify-content: space-between;
+}
+
+.share-facebook {
+  border: none;
+  border-radius: 10px;
 }
