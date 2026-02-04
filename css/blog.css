@@ -100,20 +100,16 @@
 /* ✅ Card dạng publication: ảnh nhỏ trái + text phải */
 .blog-card{
   display: grid;
-  grid-template-columns: 96px 1fr;
-  gap: 14px;
-  align-items: center;
-
-  padding: 9px;
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-
-  background: var(--blog-card-bg);
-  border: 1px solid var(--blog-card-border);
-
-  transition: transform .18s ease, border-color .18s ease, background .18s ease;
-  transform: translateZ(0);
+grid-template-columns: 76px 1fr;
+align-items: center;
+padding: 9px;
+border-radius: 16px;
+overflow: hidden;
+cursor: pointer;
+background: var(--blog-card-bg);
+border: 1px solid var(--blog-card-border);
+transition: transform .18s ease, border-color .18s ease, background .18s ease;
+transform: translateZ(0);
 }
 
 .blog-card:hover{
@@ -184,6 +180,7 @@
   font-size: 14px;
   font-weight: 650;
   opacity: 0.9;
+  margin: 0 2rem;
 }
 
 /* ✅ Responsive */
@@ -565,7 +562,6 @@ body.blog-modal-lock{ overflow: hidden; }
 
 .blog-card__spacer {
   display: flex;
-  justify-content: space-between;
 }
 
 .share-facebook {

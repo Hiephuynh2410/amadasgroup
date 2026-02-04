@@ -141,10 +141,9 @@
 /* News canh giữa như ảnh */
 .hero-news-inline__title{
   margin: 0 0 14px 0;
-  font-size: 20px;
-  font-weight: 900;
+  font-size: 14.5px;
   line-height: 1.1;
-  color: var(--text);
+  color: var(--muted);
   text-align: left;
 }
 
@@ -220,7 +219,7 @@
   min-width: 0;
   font-weight: 600;
   text-align: left;
-  font-size: 18px;
+  font-size: 14.5px;
   color: var(--muted);
   /* nếu muốn xuống dòng: đổi normal */
   white-space: nowrap;
@@ -233,8 +232,9 @@
   grid-column: 3;
   white-space: nowrap;
   text-align: right;
+  color: var(--muted);
 
-  font-size: 18px;
+  font-size: 14.5px;
   font-weight: 600;
   opacity: .95;
 }
