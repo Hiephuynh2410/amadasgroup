@@ -151,7 +151,7 @@ transform: translateZ(0);
 /* Title */
 .blog-card__title{
   margin: 0 0 6px 0;
-  /* font-size: 18px; */
+  font-size: 15px;
   line-height: 1.25;
   font-weight: 500;
 }
