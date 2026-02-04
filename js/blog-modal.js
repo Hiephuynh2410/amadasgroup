@@ -1,23 +1,15 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  // =========================
-  // 0) OPTIONAL: wait includePartials() finish (from app.js)
-  // =========================
   await waitForIncludes();
 
-  // =========================
-  // 1) Query DOM again AFTER includes
-  // =========================
-  // Có thể có hoặc không tùy trang
+
   const grid  = document.getElementById("blogGrid");
   const modal = document.getElementById("blogModal");
   const panel = document.getElementById("modalPanel");
 
-  // Ticker (Home)
   const heroWrap    = document.getElementById("heroNews");
   const heroMarquee = document.getElementById("heroNewsMarquee");
   const heroList    = document.getElementById("heroNewsList");
 
-  // Các element trong modal (có thể null nếu trang Home không có modal)
   const coverEl   = document.getElementById("modalCover");
   const titleEl   = document.getElementById("modalTitle");
   const metaEl    = document.getElementById("modalMeta");
@@ -30,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let lastThumbSrc = "";
   let isAnimating = false;
 
-  // ✅ Sau này muốn thêm bài chỉ sửa mảng này
+  //  Sau này muốn thêm bài chỉ sửa mảng này
   const HERO_NEWS_IDS = ["post-01", "post-02"];
 
   console.group("[BLOG] init (after includes)");
@@ -40,9 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("HERO_NEWS_IDS:", HERO_NEWS_IDS);
   console.groupEnd();
 
-  // =========================
-  // 2) Wait templates exist (templateblog.html include)
-  // =========================
+
   templates = await waitForTemplates(12000);
 
   console.group("[BLOG] templates");
@@ -50,22 +40,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("ids:", templates.map(t => t.id));
   console.groupEnd();
 
-  // 3) Render cards nếu có blogGrid (Blog page)
   if (grid && templates.length) renderCards();
 
-  // 4) Render ticker (Home page)
   renderHeroNewsTicker(HERO_NEWS_IDS);
 
-  // 5) Observe changes: nếu include thêm templates sau đó
   observeTemplateChanges();
 
-  // =========================
-  // INCLUDES WAIT
-  // =========================
   async function waitForIncludes(timeoutMs = 8000) {
     const start = performance.now();
 
-    // Nếu app.js có includePartials thì gọi để đảm bảo include xong
     if (typeof includePartials === "function") {
       console.log("[INCLUDE] includePartials() detected => running...");
       try { await includePartials(); }
@@ -74,8 +57,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.warn("[INCLUDE] includePartials() not found. Ensure app.js loaded before blog-modal.js");
     }
 
-    // Sau khi gọi includePartials, vẫn có thể DOM chưa kịp update nếu fetch chậm
-    // -> chờ các container có nội dung thật (hero + templateblog)
     while (performance.now() - start < timeoutMs) {
       const heroOk = !!document.getElementById("heroNews"); // hero đã vào DOM
       const tplOk  = document.querySelectorAll("template.blog-post").length > 0
@@ -92,9 +73,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return false;
   }
 
-  // =========================
-  // TEMPLATES
-  // =========================
   function getTemplates() {
     return Array.from(document.querySelectorAll("template.blog-post"));
   }
@@ -129,9 +107,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     mo.observe(container, { childList: true, subtree: true });
   }
 
-  // =========================
-  // BLOG GRID (cards)
-  // =========================
   function renderCards() {
     if (!grid) return;
     grid.innerHTML = "";
