@@ -205,7 +205,7 @@
     closeBtn.addEventListener("click", closePopup);
 
     const img = document.createElement("img");
-    img.src = asset("img/holiday/happynewyear.png");
+    img.src = asset("img/tet2026/");
     img.alt = "Happy New Year";
     img.loading = "eager";
     img.decoding = "async";
@@ -243,7 +243,7 @@
     initDecor();
 
     // nếu muốn bật popup lại thì mở dòng này
-    // window.setTimeout(() => showPopup(), prefersReducedMotion ? 0 : 180);
+    window.setTimeout(() => showPopup(), prefersReducedMotion ? 0 : 180);
   }
 
   function unmount() {
