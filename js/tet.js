@@ -41,74 +41,7 @@
 
   let mounted = false;
   let dismissedThisLoad = false;
-    // ====== TET SFX (mp3) ======
-  const TET_SFX_SRC = asset("img/audio/tieng_trong_mua_lan-www_tiengdong_com.mp3"); // <-- đổi đường dẫn mp3 của bạn ở đây
-  const TET_SFX_KEY = "AMADAS_TET_SFX_PLAYED";
-
-  let tetAudio = null;
-
-  function getTetAudio() {
-    if (tetAudio) return tetAudio;
-    tetAudio = new Audio(TET_SFX_SRC);
-    tetAudio.preload = "auto";
-    tetAudio.loop = false;
-    tetAudio.volume = 0.9; // chỉnh âm lượng
-    return tetAudio;
-  }
-
-  function markSfxPlayed() {
-    try { sessionStorage.setItem(TET_SFX_KEY, "1"); } catch {}
-  }
-
-  function hasPlayedSfx() {
-    try { return sessionStorage.getItem(TET_SFX_KEY) === "1"; } catch { return false; }
-  }
-
-  function armPlayOnUserGesture() {
-    const handler = async () => {
-      try {
-        const a = getTetAudio();
-        a.currentTime = 0;
-        await a.play();
-
-        // dừng sau 5 giây
-        window.setTimeout(() => {
-          try { a.pause(); a.currentTime = 0; } catch {}
-        }, 5000);
-
-        markSfxPlayed();
-      } catch {}
-
-      window.removeEventListener("pointerdown", handler, true);
-      window.removeEventListener("keydown", handler, true);
-      window.removeEventListener("touchstart", handler, true);
-    };
-
-    window.addEventListener("pointerdown", handler, true);
-    window.addEventListener("keydown", handler, true);
-    window.addEventListener("touchstart", handler, true);
-  }
-
-
-    async function playTetSfxOnceOnEnter() {
-    if (!mounted) return;
-    if (hasPlayedSfx()) return;
-
-    try {
-      const a = getTetAudio();
-      a.currentTime = 0;
-      await a.play();
-
-      window.setTimeout(() => {
-        try { a.pause(); a.currentTime = 0; } catch {}
-      }, 5000);
-
-      markSfxPlayed();
-    } catch {
-      armPlayOnUserGesture();
-    }
-  }
-
+ 
 
   function removeIfExists(id) {
     const el = document.getElementById(id);
@@ -205,7 +138,7 @@
     closeBtn.addEventListener("click", closePopup);
 
     const img = document.createElement("img");
-    img.src = asset("img/tet2026/");
+    img.src = asset("img/tet2026/ThiepTet.png");
     img.alt = "Happy New Year";
     img.loading = "eager";
     img.decoding = "async";

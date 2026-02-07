@@ -46,7 +46,14 @@
 
 /* ---------------------------
    Popup Happy New Year (image only)
+   ✅ Làm thiệp to hơn bằng CSS variables
 ---------------------------- */
+:root {
+  --tet-popup-pad: 12px;
+  --tet-panel-w: min(780px, 56vw);  /* ✅ tăng width mặc định */
+  --tet-panel-h: 86vh;             /* ✅ tăng max-height */
+}
+
 .tet-popup {
   position: fixed;
   inset: 0;
@@ -55,10 +62,8 @@
   z-index: 10000;
   display: grid;
   place-items: center;
-  padding: 16px;
+  padding: var(--tet-popup-pad);
   background: rgba(0, 0, 0, 0.45);
-
-  /* animation */
   animation: tetFadeIn 180ms ease-out both;
 }
 
@@ -81,17 +86,11 @@
   inset: 0;
 }
 
-/* ✅ PANEL: thu nhỏ theo màn hình + giới hạn chiều cao */
 .tet-popup__panel {
   position: relative;
-
-  /* Nhỏ hơn hẳn so với trước (860px -> 640px) */
-  width: min(640px, 86vw);
-
-  /* không vượt quá chiều cao màn hình */
-  max-height: 78vh;
-
-  border-radius: 16px;
+  width: var(--tet-panel-w);       /* ✅ to hơn */
+  max-height: var(--tet-panel-h);  /* ✅ cao hơn */
+  border-radius: 18px;
   background: transparent;
   box-shadow: 0 20px 60px rgba(0,0,0,0.28);
   overflow: visible;
@@ -100,25 +99,17 @@
 
 .tet-popup__imageWrap {
   position: relative;
-  border-radius: 16px;
+  border-radius: 18px;
   overflow: hidden;
   background: #fff;
-
-  /* ✅ để ảnh co theo chiều cao panel */
-  max-height: 78vh;
+  max-height: var(--tet-panel-h);
 }
 
 .tet-popup__imageWrap img {
   display: block;
   width: 100%;
-
-  /* ✅ quan trọng: không cho ảnh vượt quá màn hình */
-  max-height: 78vh;
-
-  /* giữ tỉ lệ ảnh */
+  max-height: var(--tet-panel-h);
   height: auto;
-
-  /* nếu bạn muốn luôn “fit gọn” theo chiều cao thì bật thêm: */
   object-fit: contain;
 }
 
@@ -126,15 +117,15 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
   border: 0;
   cursor: pointer;
   background: rgba(0,0,0,0.55);
   color: #fff;
   font-size: 20px;
-  line-height: 34px;
+  line-height: 36px;
   text-align: center;
   z-index: 2;
 }
@@ -144,24 +135,20 @@
 }
 
 /* ---------------------------
-   ✅ Responsive breakpoints
+   ✅ Responsive breakpoints (đã tăng size desktop)
 ---------------------------- */
 
 /* Mobile nhỏ */
 @media (max-width: 480px) {
+  :root {
+    --tet-popup-pad: 10px;
+    --tet-panel-w: min(380px, 94vw);
+    --tet-panel-h: 74vh;
+  }
+
   .tet-lantern-left,
   .tet-lantern-right {
     width: 110px;
-  }
-
-  .tet-popup__panel {
-    width: min(320px, 86vw);
-    max-height: 70vh;
-  }
-
-  .tet-popup__imageWrap,
-  .tet-popup__imageWrap img {
-    max-height: 70vh;
   }
 
   .tet-popup__close {
@@ -176,36 +163,32 @@
 
 /* Mobile lớn / Tablet dọc */
 @media (min-width: 481px) and (max-width: 768px) {
-  .tet-popup__panel {
-    width: min(420px, 82vw);
-    max-height: 72vh;
-  }
-  .tet-popup__imageWrap,
-  .tet-popup__imageWrap img {
-    max-height: 72vh;
+  :root {
+    --tet-panel-w: min(560px, 78vw);
+    --tet-panel-h: 78vh;
   }
 }
 
 /* Tablet ngang / laptop nhỏ */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .tet-popup__panel {
-    width: min(520px, 74vw);
-    max-height: 74vh;
-  }
-  .tet-popup__imageWrap,
-  .tet-popup__imageWrap img {
-    max-height: 74vh;
+  :root {
+    --tet-panel-w: min(720px, 88vw);
+    --tet-panel-h: 82vh;
   }
 }
 
-/* Desktop lớn */
+/* Desktop */
 @media (min-width: 1025px) {
-  .tet-popup__panel {
-    width: min(560px, 52vw);
-    max-height: 76vh;
+  :root {
+    --tet-panel-w: min(900px, 70vw); /* ✅ desktop: to hơn rõ */
+    --tet-panel-h: 86vh;
   }
-  .tet-popup__imageWrap,
-  .tet-popup__imageWrap img {
-    max-height: 76vh;
+}
+
+/* Desktop rất lớn */
+@media (min-width: 1440px) {
+  :root {
+    --tet-panel-w: min(1020px, 60vw); /* ✅ màn hình lớn: lên ~1000px */
+    --tet-panel-h: 88vh;
   }
 }
