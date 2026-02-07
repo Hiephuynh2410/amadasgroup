@@ -188,7 +188,7 @@
 /* Desktop rất lớn */
 @media (min-width: 1440px) {
   :root {
-    --tet-panel-w: min(1020px, 60vw); /* ✅ màn hình lớn: lên ~1000px */
+    --tet-panel-w: min(1020px, 51vw); /* ✅ màn hình lớn: lên ~1000px */
     --tet-panel-h: 88vh;
   }
 }
