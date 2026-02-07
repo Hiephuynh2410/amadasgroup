@@ -80,14 +80,14 @@
 
     createFixedImage({
       id: IDS.left,
-      src: asset("img/holiday/Latern_left.png"),
+      src: asset("img/holiday/Rev02ConLan_T.png"),
       className: "tet-lantern-left",
       wobble: !prefersReducedMotion,
     });
 
     createFixedImage({
       id: IDS.right,
-      src: asset("img/holiday/Latern_right.png"),
+      src: asset("img/holiday/Rev02ConLan_P.png"),
       className: "tet-lantern-right",
       wobble: !prefersReducedMotion,
     });

@@ -13,9 +13,12 @@
 }
 
 .tet-fixed img{
-  display: block;
+  /* display: block;
   width: 100%;
-  height: auto;
+  height: auto; */
+  display: block;
+  width: 18vw;
+  height: 38vh;
 }
 
 .tet-inner{ will-change: transform; }
@@ -23,8 +26,10 @@
 /* Đặt lồng đèn thấp xuống dưới header */
 #tet-lantern-left,
 #tet-lantern-right{
-  top: 90px;                 /* chỉnh số này nếu header cao hơn */
-  width: clamp(120px, 14vw, 230px);
+  top: clamp(65px, 23vh, 146px);
+width: clamp(120px, 35vw, 350px);
+  /* top: 90px; */
+  /* width: clamp(120px, 14vw, 230px); */
 }
 
 #tet-lantern-left{ left: 16px; }
@@ -35,20 +40,22 @@
   transform-origin: 50% 15%;
   animation: tetWobble 1.8s ease-in-out infinite;
 }
-
-@keyframes tetWobble{
-  0%   { transform: rotate(-4deg) translateY(0px); }
-  50%  { transform: rotate(4deg)  translateY(-4px); }
-  100% { transform: rotate(-4deg) translateY(0px); }
-}
-
-@media (max-width: 768px){
+@media (max-width: 1024px){
   #tet-lantern-left,
   #tet-lantern-right{
     display: none !important;
   }
 }
 
+/* Bổ sung: thiết bị cảm ứng (tablet/phone) dù width lớn vẫn ẩn */
+@media (hover: none) and (pointer: coarse){
+  #tet-lantern-left,
+  #tet-lantern-right{
+    display: none !important;
+  }
+}
+
+/* tôn trọng người dùng giảm animation */
 @media (prefers-reduced-motion: reduce){
   .tet-wobble{ animation: none !important; }
 }
