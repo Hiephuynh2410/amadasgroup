@@ -361,10 +361,10 @@
 
     await loadScriptOnce("amadas-scroll", absUrl("js/scroll.js"));
 
-    await loadScriptOnce("amadas-tet", absUrl("js/tet.js"));
-    if (typeof window.amadasTetInit === "function") {
-      try { await window.amadasTetInit(); } catch (e) { console.error(e); }
-    }
+    // await loadScriptOnce("amadas-tet", absUrl("js/tet.js"));
+    // if (typeof window.amadasTetInit === "function") {
+    //   try { await window.amadasTetInit(); } catch (e) { console.error(e); }
+    // }
 
     await loadScriptOnce("amadas-theme-mode", absUrl("js/theme-toggle.js"));
     if (typeof window.amadasThemeModeInit === "function") {
