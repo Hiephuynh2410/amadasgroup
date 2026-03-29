@@ -14,6 +14,12 @@ const POSTS = {
       "In January 2026, the research group recorded several notable academic outcomes with manuscripts accepted at international and national conferences.",
     image: `${SITE_ORIGIN}/img/blog/YEP.jpg`,
   },
+  "post-03": {
+    title: "Research Highlights and Academic Activities – Mar 2026",
+    description:
+      "In March 2026, the research group recorded several notable academic outcomes with three research manuscripts.",
+    image: `${SITE_ORIGIN}/img/blog/march_2026.jpg`,
+  },
 };
 
 // Bot detector (Facebook/Twitter/Slack/Discord…)
