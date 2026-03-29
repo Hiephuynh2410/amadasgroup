@@ -22,7 +22,6 @@
         bound: false,
         yearInfo: null,
 
-        // ✅ NEW: guards to stop infinite re-hydrate loops
         hydrating: false,
         tplSig: "",
       });
@@ -39,7 +38,7 @@
     if (!state.bound) {
       bindEvents(state);
       bindLifecycle(state);
-      startObserver(state); // ✅ now safe (not body-wide)
+      startObserver(state);
       state.bound = true;
     }
 
@@ -47,7 +46,6 @@
     hydrate(state);
   };
 
-  // ✅ FIX 1: lock hydrate (no re-entrant)
   function hydrate(state) {
     if (state.hydrating) return;
     state.hydrating = true;
@@ -166,9 +164,7 @@
     );
   }
 
-  // ✅ FIX 3: DO NOT observe document.body (causes endless loop)
   function startObserver(state) {
-    // chỉ observe nơi chứa templates/blog block (tùy bạn đang include ở đâu)
     const mount =
       document.getElementById("templateblog-container") ||
       document.getElementById("templateblog") ||
@@ -176,14 +172,12 @@
       document.getElementById("heroNews") ||
       null;
 
-    // Nếu trang này không có blog/templates => không observe
     if (!mount) return;
 
     const mo = new MutationObserver(() => {
       const tpls = document.querySelectorAll("template.blog-post");
       const sig = Array.from(tpls).map((t) => t.id).join("|");
 
-      // chỉ hydrate khi danh sách template đổi
       if (sig !== state.tplSig) {
         state.tplSig = sig;
         scheduleHydrate(state);
@@ -317,11 +311,10 @@
 
     state.lastActive = document.activeElement;
 
-    const animate = !!opts.fromCard && !!state.lastThumbRect;
     await openFromTemplate(state, tpl, {
-      animate,
-      thumbRect: state.lastThumbRect,
-      thumbSrc: state.lastThumbSrc,
+      animate: false,
+      thumbRect: null,
+      thumbSrc: "",
       postId,
     });
   }
@@ -334,11 +327,11 @@
     if (state.isAnimating) return;
     if (modal.classList.contains("is-open")) return;
 
-    const { animate = false, thumbRect = null, thumbSrc = "", postId = tpl.id } = opts;
+    const { postId = tpl.id } = opts;
 
     const title = tpl.dataset.title || "Untitled";
     const meta = tpl.dataset.meta || "";
-    const cover = tpl.dataset.cover || thumbSrc || "";
+    const cover = tpl.dataset.cover || "";
     const excerpt = tpl.dataset.excerpt || "";
 
     titleEl.textContent = title;
@@ -357,33 +350,12 @@
     });
 
     modal.dataset.activePostId = postId;
-
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("blog-modal-lock");
 
     hardResetPanelHidden(panel);
-
-    await nextFrame();
-    await nextFrame();
-
-    if (animate && thumbRect && coverEl) {
-      state.isAnimating = true;
-      const ghost = createGhost(thumbRect, thumbSrc || cover);
-      const coverRect = coverEl.getBoundingClientRect();
-
-      await animateGhost(ghost, thumbRect, coverRect, {
-        fromRadius: 14,
-        toRadius: 14,
-        duration: 720,
-      });
-
-      panel.style.opacity = "1";
-      ghost.remove();
-      state.isAnimating = false;
-    } else {
-      panel.style.opacity = "1";
-    }
+    panel.style.opacity = "1";
 
     const closeBtn = modal.querySelector(".blog-modal__close");
     if (closeBtn) closeBtn.focus();
@@ -413,7 +385,6 @@
     queueOpen(state, postId, { fromCard: false });
   }
 
-  // ✅ FIX 2: signature cho hero ticker (không đổi thì không innerHTML lại)
   function renderHeroNewsTicker(state) {
     const heroWrap = document.getElementById("heroNews");
     const heroMarquee = document.getElementById("heroNewsMarquee");
@@ -500,127 +471,118 @@
   }
 
   function renderHeroInlineNews(state) {
-      const wrap = document.getElementById("heroNewsInline");
-      const list = document.getElementById("heroNewsInlineList");
-      if (!wrap || !list) return;
+    const wrap = document.getElementById("heroNewsInline");
+    const list = document.getElementById("heroNewsInlineList");
+    if (!wrap || !list) return;
 
-      const buildLine = (title, month) => {
-        const t = String(title || "").trim();
-        const m = String(month || "").trim();
-        return m ? `${m}: ${t}` : t;
-      };
+    const buildLineHtml = (title, monthLabel) => {
+      return `<strong class="hero-news-inline__month">${escHtml(monthLabel)}</strong> ${escHtml(title)}`;
+    };
 
-      const buildLineHtml = (title, monthLabel) => {
-        return `<strong class="hero-news-inline__month">${escHtml(monthLabel)}</strong> ${escHtml(title)}`;
-      };
+    const buildItemHtml = (p, onBlog) => {
+      const metaFirstRaw = String(p.meta).split("•")[0].trim();
+      const monthLabel = onBlog ? metaFirstRaw : metaFirstToMonth(metaFirstRaw);
+      const lineHtml = buildLineHtml(p.title, monthLabel);
 
-      const buildItemHtml = (p, onBlog) => {
-        const metaFirstRaw = String(p.meta).split("•")[0].trim();
-        const monthLabel = onBlog ? metaFirstRaw : metaFirstToMonth(metaFirstRaw);
-        const lineHtml = buildLineHtml(p.title, monthLabel);
+      return `
+        <button type="button" class="hero-news-inline__item" data-post-id="${escAttr(p.id)}">
+          <span class="hero-news-inline__itemTitle">${lineHtml}</span>
+        </button>
+      `;
+    };
 
-        return `
-          <button type="button" class="hero-news-inline__item" data-post-id="${escAttr(p.id)}">
-            <span class="hero-news-inline__itemTitle">${lineHtml}</span>
-          </button>
-        `;
-      };
+    if (!state.templates || !state.templates.length) {
+      wrap.hidden = false;
 
-      if (!state.templates || !state.templates.length) {
-        wrap.hidden = false;
+      const sigLoading = "__loading__";
+      if (list.dataset.sig === sigLoading) return;
+      list.dataset.sig = sigLoading;
 
-        const sigLoading = "__loading__";
-        if (list.dataset.sig === sigLoading) return;
-        list.dataset.sig = sigLoading;
+      list.innerHTML = `<div class="hero-news-inline__loading">Loading news…</div>`;
+      return;
+    }
 
-        list.innerHTML = `<div class="hero-news-inline__loading">Loading news…</div>`;
-        return;
-      }
+    const postsAll = state.templates
+      .map((tpl) => {
+        const title = tpl.dataset.title || "Untitled";
+        const meta = tpl.dataset.meta || "";
+        const year = extractYearFromMeta(meta);
+        const date = extractDateFromMeta(meta);
+        return { id: tpl.id, title, meta, year, date };
+      })
+      .filter((p) => Number.isFinite(p.year));
 
-      const postsAll = state.templates
-        .map((tpl) => {
-          const title = tpl.dataset.title || "Untitled";
-          const meta = tpl.dataset.meta || "";
-          const year = extractYearFromMeta(meta);
-          const date = extractDateFromMeta(meta);
-          return { id: tpl.id, title, meta, year, date };
-        })
-        .filter((p) => Number.isFinite(p.year));
+    const inlineSig = postsAll.map((p) => `${p.id}|${p.title}|${p.meta}`).join("||");
+    if (list.dataset.sig === inlineSig) return;
+    list.dataset.sig = inlineSig;
 
-      const inlineSig = postsAll.map((p) => `${p.id}|${p.title}|${p.meta}`).join("||");
-      if (list.dataset.sig === inlineSig) return;
-      list.dataset.sig = inlineSig;
+    if (!postsAll.length) {
+      wrap.hidden = true;
+      list.innerHTML = "";
+      return;
+    }
 
-      if (!postsAll.length) {
-        wrap.hidden = true;
-        list.innerHTML = "";
-        return;
-      }
+    const inlineYearEl = document.getElementById("heroNewsInlineYear");
+    const onBlog = isOnBlogPage(state);
 
-      const inlineYearEl = document.getElementById("heroNewsInlineYear");
-      const onBlog = isOnBlogPage(state);
+    if (Number.isFinite(state.cfg.inlineYear)) {
+      const targetYear = state.cfg.inlineYear;
+      if (inlineYearEl) inlineYearEl.textContent = String(targetYear);
 
-      // ===== Case 1: fixed year (inlineYear) =====
-      if (Number.isFinite(state.cfg.inlineYear)) {
-        const targetYear = state.cfg.inlineYear;
-        if (inlineYearEl) inlineYearEl.textContent = String(targetYear);
+      const posts = postsAll.filter((p) => p.year === targetYear);
+      posts.sort((a, b) => (a.date && b.date ? b.date - a.date : a.id.localeCompare(b.id)));
 
-        const posts = postsAll.filter((p) => p.year === targetYear);
-        posts.sort((a, b) => (a.date && b.date ? b.date - a.date : a.id.localeCompare(b.id)));
-
-        if (!posts.length) {
-          wrap.hidden = true;
-          list.innerHTML = "";
-          return;
-        }
-
-        wrap.hidden = false;
-        list.innerHTML = posts.map((p) => buildItemHtml(p, onBlog)).join("");
-        return;
-      }
-
-      // ===== Case 2: show top 2 years =====
-      const top2 = getTopYears(state.yearInfo, 2);
-      if (inlineYearEl) inlineYearEl.textContent = formatTopYearsLabel(top2);
-
-      const yearsToShow = top2.slice();
-      const groups = new Map();
-      for (const y of yearsToShow) groups.set(y, []);
-
-      for (const p of postsAll) {
-        if (groups.has(p.year)) groups.get(p.year).push(p);
-      }
-
-      for (const y of yearsToShow) {
-        const arr = groups.get(y);
-        arr.sort((a, b) => (a.date && b.date ? b.date - a.date : a.id.localeCompare(b.id)));
-      }
-
-      const any = yearsToShow.some((y) => (groups.get(y) || []).length);
-      if (!any) {
+      if (!posts.length) {
         wrap.hidden = true;
         list.innerHTML = "";
         return;
       }
 
       wrap.hidden = false;
-      list.innerHTML = yearsToShow
-        .map((y) => {
-          const arr = groups.get(y) || [];
-          if (!arr.length) return "";
-
-          const items = arr.map((p) => buildItemHtml(p, onBlog)).join("");
-
-          return `
-            <div class="hero-news-inline__group">
-              <div class="hero-news-inline__groupYear">${y}</div>
-              <div class="hero-news-inline__groupList">${items}</div>
-            </div>
-          `;
-        })
-        .join("");
+      list.innerHTML = posts.map((p) => buildItemHtml(p, onBlog)).join("");
+      return;
     }
 
+    const top2 = getTopYears(state.yearInfo, 2);
+    if (inlineYearEl) inlineYearEl.textContent = formatTopYearsLabel(top2);
+
+    const yearsToShow = top2.slice();
+    const groups = new Map();
+    for (const y of yearsToShow) groups.set(y, []);
+
+    for (const p of postsAll) {
+      if (groups.has(p.year)) groups.get(p.year).push(p);
+    }
+
+    for (const y of yearsToShow) {
+      const arr = groups.get(y);
+      arr.sort((a, b) => (a.date && b.date ? b.date - a.date : a.id.localeCompare(b.id)));
+    }
+
+    const any = yearsToShow.some((y) => (groups.get(y) || []).length);
+    if (!any) {
+      wrap.hidden = true;
+      list.innerHTML = "";
+      return;
+    }
+
+    wrap.hidden = false;
+    list.innerHTML = yearsToShow
+      .map((y) => {
+        const arr = groups.get(y) || [];
+        if (!arr.length) return "";
+
+        const items = arr.map((p) => buildItemHtml(p, onBlog)).join("");
+
+        return `
+          <div class="hero-news-inline__group">
+            <div class="hero-news-inline__groupYear">${y}</div>
+            <div class="hero-news-inline__groupList">${items}</div>
+          </div>
+        `;
+      })
+      .join("");
+  }
 
   function detectYearInfoFromTemplates(templates = []) {
     const years = (templates || [])
@@ -675,28 +637,7 @@
   }
 
   async function closeModal(state) {
-    const dom = getModalDom();
-    const { modal, panel, coverEl, bodyEl } = dom;
-    if (!modal || !panel || !coverEl || !bodyEl) return;
     if (state.isAnimating) return;
-
-    if (!state.lastThumbRect) return finalizeClose(state);
-
-    state.isAnimating = true;
-
-    const coverRect = coverEl.getBoundingClientRect();
-    const ghost = createGhost(coverRect, coverEl.currentSrc || coverEl.src || state.lastThumbSrc);
-
-    panel.style.opacity = "0";
-
-    await animateGhost(ghost, coverRect, state.lastThumbRect, {
-      fromRadius: 14,
-      toRadius: 14,
-      duration: 520,
-    });
-
-    ghost.remove();
-    state.isAnimating = false;
     finalizeClose(state);
   }
 
@@ -718,9 +659,9 @@
 
   function hardResetPanelHidden(panel) {
     panel.style.transition = "none";
-    panel.style.transform = "translate(-50%, -50%)";
-    panel.style.borderRadius = "18px";
-    panel.style.opacity = "0";
+    panel.style.transform = "";
+    panel.style.borderRadius = "";
+    panel.style.opacity = "";
     panel.getBoundingClientRect();
     panel.style.transition = "";
   }
@@ -829,20 +770,18 @@
     if (!parts.length) return String(meta || "");
     const d = parseDateLoose(parts[0]);
     if (!d) return String(meta || "");
-    parts[0] = d.toLocaleString("en-US", { month: "short", year: "numeric" }); // "Feb 2026"
+    parts[0] = d.toLocaleString("en-US", { month: "short", year: "numeric" });
     return parts.join(" • ");
   }
-
 
   function metaFirstToMonth(dateStr = "") {
     const d = parseDateLoose(String(dateStr).trim());
     if (!d) return String(dateStr || "");
 
-    const mon = d.toLocaleString("en-US", { month: "short" }); // "Feb"
-    const yr = d.getFullYear();                               // 2026
-    return `${mon} ${yr}`;                                    // "Feb 2026"
+    const mon = d.toLocaleString("en-US", { month: "short" });
+    const yr = d.getFullYear();
+    return `${mon} ${yr}`;
   }
-
 
   function parseDateLoose(s) {
     const raw = String(s || "").trim();
