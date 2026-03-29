@@ -213,18 +213,18 @@
 
 /* =========================
    MODAL
-   Full page dưới header bar
+   FULL CẢ TRANG - ĐÈ HEADER
    TẮT HOÀN TOÀN HIỆU ỨNG
    ========================= */
 .blog-modal{
   position: fixed;
-  top: var(--site-header-height);
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 9999;
+  inset: 0;
+  z-index: 999999999;
   display: none;
   pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
 }
 
 .blog-modal.is-open{
@@ -252,9 +252,10 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  min-height: 100%;
   border-radius: 0;
   overflow: hidden;
-  background: var(--blog-modal-panel-bg);
+  background: var(--blog-post-bg);
   border: none;
   box-shadow: none;
   display: flex;
@@ -316,8 +317,9 @@
   gap: 12px;
   padding: 12px 56px 10px 14px;
   border-bottom: 1px solid var(--blog-modal-top-line);
-  flex-shrink: 0;
+  flex: 0 0 auto;
   min-height: 88px;
+  background: var(--blog-post-bg);
 }
 
 @media (max-width: 720px){
@@ -392,25 +394,38 @@
    CONTENT
    ========================= */
 .blog-modal__content{
-  flex: 1;
-  overflow: auto;
-  background: var(--blog-post-bg);
+  flex: 1 1 auto;
   min-height: 0;
+  height: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--blog-post-bg);
 }
 
 .blog-modal__body{
+  min-height: 100%;
+  box-sizing: border-box;
   padding: 22px 18px 40px;
   color: var(--blog-post-text);
+  background: var(--blog-post-bg);
+  display: flex;
+  flex-direction: column;
 }
 
 /* =========================
    POST TYPOGRAPHY
    ========================= */
 .blog-modal__body .post{
+  width: 100%;
   max-width: 980px;
+  min-height: 100%;
+  flex: 1 0 auto;
   margin: 0 auto;
   line-height: 1.78;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  display: flex;
+  flex-direction: column;
+  background: var(--blog-post-bg);
 }
 
 .blog-modal__body .post h1{
@@ -471,6 +486,22 @@
   font-size: 13px;
 }
 
+/* đẩy phần cuối xuống đáy khi bài ngắn */
+.blog-modal__body .post .post-footer{
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--blog-post-line);
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* nếu bài không có footer thì vẫn giữ kín đáy */
+.blog-modal__body .post::after{
+  content: "";
+  display: block;
+  flex: 1 0 24px;
+}
+
 /* =========================
    PRETTY LINKS
    ========================= */
@@ -505,14 +536,6 @@
 }
 
 /* Source link block at end */
-.blog-modal__body .post .post-footer{
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--blog-post-line);
-  display: flex;
-  justify-content: flex-start;
-}
-
 .blog-modal__body .post .post-source{
   display: inline-flex;
   align-items: center;
