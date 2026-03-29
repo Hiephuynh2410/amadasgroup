@@ -420,7 +420,7 @@
 .blog-modal__body .post .post-caption {
   margin-top: 8px;
   color: var(--blog-post-muted);
-  font-size: 13px;
+  font-size: 12px;
   font-style: italic;
   text-align: center;
   opacity: 0.85;
