@@ -20,6 +20,13 @@ const POSTS = {
       "In March 2026, the research group recorded several notable academic outcomes with three research manuscripts.",
     image: `${SITE_ORIGIN}/img/blog/march_2026.jpg`,
   },
+  "post-04": {
+    title: "Provincial Science and Technology Project on AI-Based Breast Cancer Diagnosis",
+    description:
+      "On March 24, 2026, the Department of Science and Technology of Dong Thap Province.",
+    image: `${SITE_ORIGIN}/img/blog/UngThuNhu/11.jpg`,
+  },
+
 };
 
 // Bot detector (Facebook/Twitter/Slack/Discord…)
