@@ -228,6 +228,7 @@
 
 .hero-news-inline__month {
   margin-right: 3rem;
+  display: none;
 }
 
 /* Focus keyboard */
