@@ -492,7 +492,7 @@
   .blog-modal__body .post .post-caption,
   .blog-modal__body .post .post-caption-group,
   .blog-modal__body .post .post-figure-grid .post-caption {
-    text-align: left;
+    text-align: center;
   }
 
   /* CHỈ TRÊN ĐIỆN THOẠI: ẩn hiệu ứng xuống dòng của br trong caption */
