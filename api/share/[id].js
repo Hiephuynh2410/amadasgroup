@@ -33,6 +33,13 @@ const POSTS = {
     image: `${SITE_ORIGIN}/img/blog/Khoi_Loc/loc.jpg`,
   },
 
+   "post-06": {
+    title: "AMaDaS Research Group at ACIIDS 2026",
+    description:
+      "AMaDaS Research Group at ACIIDS 2026.",
+    image: `${SITE_ORIGIN}/img/blog/ACIIDS_2026/accids2.jpg`,
+  },
+
 };
 
 // Bot detector (Facebook/Twitter/Slack/Discord…)

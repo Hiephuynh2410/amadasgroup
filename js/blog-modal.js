@@ -30,7 +30,7 @@
       blogPageUrl: options.blogPageUrl || "/layout/blog/blog.html",
       inlineYear: Number.isFinite(options.inlineYear) ? options.inlineYear : NaN,
       shareOrigin: options.shareOrigin || window.location.origin,
-      heroNewsIds: Array.isArray(options.heroNewsIds) ? options.heroNewsIds : ["post-01", "post-02", "post-03", "post-04", "post-05"],
+      heroNewsIds: Array.isArray(options.heroNewsIds) ? options.heroNewsIds : ["post-01", "post-02", "post-03", "post-04", "post-05", "post-06"],
       templatesTimeout: Number.isFinite(options.templatesTimeout) ? options.templatesTimeout : 12000,
       readyTimeout: Number.isFinite(options.readyTimeout) ? options.readyTimeout : 8000,
     };
