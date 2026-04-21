@@ -26,6 +26,12 @@ const POSTS = {
       "On March 24, 2026, the Department of Science and Technology of Dong Thap Province.",
     image: `${SITE_ORIGIN}/img/blog/UngThuNhu/11.jpg`,
   },
+  "post-05": {
+    title: "Two Research Assistants Recognized for Student Research in Topological Data Analysis",
+    description:
+      "Two Research Assistants Recognized for Student Research in Topological Data Analysis.",
+    image: `${SITE_ORIGIN}/img/blog/Khoi_Loc/loc.jpg`,
+  },
 
 };
 
