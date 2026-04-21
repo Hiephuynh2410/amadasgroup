@@ -34,9 +34,9 @@ const POSTS = {
   },
 
    "post-06": {
-    title: "AMaDaS Research Group at ACIIDS 2026",
+    title: "AMaDaS Research Group at ICCIES 2026 and ACIIDS 2026",
     description:
-      "AMaDaS Research Group at ACIIDS 2026.",
+      "AMaDaS Research Group at ICCIES 2026 and ACIIDS 2026.",
     image: `${SITE_ORIGIN}/img/blog/ACIIDS_2026/accids2.jpg`,
   },
 
