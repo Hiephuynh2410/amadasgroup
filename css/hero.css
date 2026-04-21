@@ -52,7 +52,8 @@
   gap: 18px;
 
   /* chạy phải -> trái */
-  animation: heroMarquee 24s linear infinite;
+  animation: heroMarquee 40s linear infinite;
+
 }
 
 /* mỗi row là 1 cụm, mình nhân đôi 2 row để loop mượt */
