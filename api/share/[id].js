@@ -47,6 +47,13 @@ const POSTS = {
     image: `${SITE_ORIGIN}/img/blog/Hutech_Conf/cert1.png`,
   },
 
+  "post-08": {
+    title: "AMaDaS Research Group at ICT 2026 National Science Conference",
+    description:
+      "AMaDaS Research Group at ICT 2026 National Science Conference.",
+    image: `${SITE_ORIGIN}/img/blog/ICT2026/AMaDaS_ICT.jpg`,
+  },
+
 };
 
 // Bot detector (Facebook/Twitter/Slack/Discord…)
