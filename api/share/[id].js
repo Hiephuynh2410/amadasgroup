@@ -40,6 +40,13 @@ const POSTS = {
     image: `${SITE_ORIGIN}/img/blog/ACIIDS_2026/accids2.jpg`,
   },
 
+  "post-07": {
+    title: "AMaDaS Research Group at HUTECH Conference for Young Scientists 2026 (CYSG 2026)",
+    description:
+      "AMaDaS Research Group at HUTECH Conference for Young Scientists 2026 (CYSG 2026).",
+    image: `${SITE_ORIGIN}/img/blog/Hutech_Conf/cert1.png`,
+  },
+
 };
 
 // Bot detector (Facebook/Twitter/Slack/Discord…)
